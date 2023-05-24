@@ -1,8 +1,8 @@
-##LibrarIST - Library Management App
+# LibrarIST - Library Management App
 
 LibrarIST is a powerful library management app developed for the Android operating system. It provides mobile support for free libraries, similar to the Little Free Library initiative. The app helps users locate free libraries in their vicinity and explore the books available in those libraries. It also assists in managing book inventories by facilitating donations, checkouts, and returns.
 
-# Features
+## Features
 The app consists of the following mandatory features:
 
 Map of available free libraries, including the ability to drag the map and view more libraries.
