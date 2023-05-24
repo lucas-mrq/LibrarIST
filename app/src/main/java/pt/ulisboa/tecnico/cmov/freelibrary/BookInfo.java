@@ -24,13 +24,23 @@ public class BookInfo extends AppCompatActivity {
         titleText.setText(title);
         authorText.setText(author);
 
-        Button backButton = (Button) findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
+
+
+        Button mapButton = (Button) findViewById(R.id.mapMenuBook);
+        mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                setResult(RESULT_CANCELED, intent);
-                finish();
+                Intent intent = new Intent(BookInfo.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button searchButton = (Button) findViewById(R.id.searchMenuBook);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(BookInfo.this, SearchActivity.class);
+                startActivity(intent);
             }
         });
     }
