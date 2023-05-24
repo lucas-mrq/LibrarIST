@@ -70,6 +70,16 @@ public class LibraryInfo extends AppCompatActivity {
             }
         });
 
+        Button donateButton = (Button) findViewById(R.id.donateButton);
+        donateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LibraryInfo.this, newBook.class);
+                intent.putExtra("library", name);
+                startActivity(intent);
+            }
+        });
+
         Button mapButton = (Button) findViewById(R.id.mapMenuLibrary);
         mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
