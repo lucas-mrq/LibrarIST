@@ -30,7 +30,7 @@ public class BookInfo extends AppCompatActivity {
         mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(BookInfo.this, MainActivity.class);
+                Intent intent = new Intent(BookInfo.this, MapsActivity.class);
                 startActivity(intent);
             }
         });
