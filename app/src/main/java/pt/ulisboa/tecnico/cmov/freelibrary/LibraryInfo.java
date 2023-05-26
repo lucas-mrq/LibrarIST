@@ -1,16 +1,15 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +22,13 @@ public class LibraryInfo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_info);
 
+        //Get Library Name
         Intent intent = getIntent();
-
         String name = intent.getStringExtra("name");
         TextView titleText = (TextView) findViewById(R.id.libraryName);
         titleText.setText(name);
 
+        //Define Favorite library button => Temporary as a Text variable / store in server in future
         final Button[] favoriteButton = {(Button) findViewById(R.id.favoriteButton)};
         final boolean[] isFavorite = {intent.getBooleanExtra("favorite", false)};
         if(isFavorite[0]) {
@@ -36,83 +36,70 @@ public class LibraryInfo extends AppCompatActivity {
         } else {
             favoriteButton[0].setText("✩");
         }
-        favoriteButton[0].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(isFavorite[0]) {
-                    favoriteButton[0].setText("✩");
-                } else {
-                    favoriteButton[0].setText("★");
-                }
-                isFavorite[0] = !isFavorite[0];
+        favoriteButton[0].setOnClickListener(view -> {
+            if(isFavorite[0]) {
+                favoriteButton[0].setText("✩");
+            } else {
+                favoriteButton[0].setText("★");
             }
+            isFavorite[0] = !isFavorite[0];
         });
 
+        //Temporary list => Will be send by server in the future
         List<Book> bookList = new ArrayList<>();
-        Book book1 = new Book(0, "Les Misérables", "Victor Hugo", "0");
-        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "1");
+        Book book1 = new Book(0, "Les Miserables", "Victor Hugo");
+        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine");
         bookList.add(book1);
         bookList.add(book2);
-        List<String> titles =  bookList.stream().map(Book::getTitle).collect(Collectors.toList());;
+        List<String> titles =  bookList.stream().map(Book::getTitle).collect(Collectors.toList());
         ArrayAdapter<String> adapter = new ArrayAdapter<>(LibraryInfo.this, android.R.layout.simple_list_item_1, titles);
 
+        //Define the list of library's books
         ListView listBooks = findViewById(R.id.listBooks);
         listBooks.setAdapter(adapter);
-        listBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Book book = bookList.get(position);
-                Intent intent = new Intent(LibraryInfo.this, BookInfo.class);
-                intent.putExtra("id", book.getId());
-                intent.putExtra("title", book.getTitle());
-                intent.putExtra("author", book.getAuthor());
-                startActivity(intent);
-            }
+        listBooks.setOnItemClickListener((adapterView, view, position, id) -> {
+            Book book = bookList.get(position);
+            Intent intent1 = new Intent(LibraryInfo.this, BookInfo.class);
+            intent1.putExtra("id", book.getId());
+            intent1.putExtra("title", book.getTitle());
+            intent1.putExtra("author", book.getAuthor());
+            startActivity(intent1);
         });
 
+        //Define new Book button => Will change to a scan parameter if book is unknown
         Button donateButton = (Button) findViewById(R.id.donateButton);
-        donateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LibraryInfo.this, newBook.class);
-                intent.putExtra("library", name);
-                startActivity(intent);
+        donateButton.setOnClickListener(view -> {
+            Intent intent12 = new Intent(LibraryInfo.this, newBook.class);
+            intent12.putExtra("library", name);
+            startActivity(intent12);
+        });
+
+        //Define Google Map itinerary Button
+        String address = intent.getStringExtra("address");
+        Button itineraryButton = (Button) findViewById(R.id.itineraryButton);
+        itineraryButton.setText("Go to: " + address);
+        itineraryButton.setOnClickListener(view -> {
+            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+            if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(mapIntent);
+            } else {
+                itineraryButton.setText("Install Google Map");
             }
         });
 
+        //Define Map & Search Buttons
         Button mapButton = (Button) findViewById(R.id.mapMenuLibrary);
-        mapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LibraryInfo.this, MainActivity.class);
-                startActivity(intent);
-            }
+        mapButton.setOnClickListener(view -> {
+            Intent intent13 = new Intent(LibraryInfo.this, MainActivity.class);
+            startActivity(intent13);
         });
 
         Button searchButton = (Button) findViewById(R.id.searchMenuLibrary);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LibraryInfo.this, SearchActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        String address = intent.getStringExtra("address");
-        Button itineraryButton = (Button) findViewById(R.id.itinaryButton);
-        itineraryButton.setText("Go to: " + address);
-        itineraryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(mapIntent);
-                } else {
-                    itineraryButton.setText("Install Google Map");
-                }
-            }
+        searchButton.setOnClickListener(view -> {
+            Intent intent14 = new Intent(LibraryInfo.this, SearchActivity.class);
+            startActivity(intent14);
         });
     }
 }

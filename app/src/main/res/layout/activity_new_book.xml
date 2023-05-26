@@ -2,30 +2,38 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scanPhoto"
+    android:id="@+id/newBookView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".newBook">
 
-    <Button
-        android:id="@+id/searchMenuNewBook"
-        android:layout_width="150dp"
-        android:layout_height="39dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
-        android:text="Search"
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <Button
-        android:id="@+id/mapMenuNewBook"
-        android:layout_width="150dp"
-        android:layout_height="39dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginBottom="15dp"
-        android:text="Map"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <Button
+            android:id="@+id/mapMenuNewBook"
+            android:layout_width="150dp"
+            android:layout_height="39dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="15dp"
+            android:text="@string/map" />
+
+        <Button
+            android:id="@+id/searchMenuNewBook"
+            android:layout_width="150dp"
+            android:layout_height="39dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="15dp"
+            android:text="@string/search" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/bookLibrary"
@@ -68,7 +76,8 @@
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/bookName"
         app:layout_constraintStart_toEndOf="@+id/bookName"
-        app:layout_constraintTop_toTopOf="@+id/bookName" />
+        app:layout_constraintTop_toTopOf="@+id/bookName"
+        tools:ignore="LabelFor" />
 
     <TextView
         android:id="@+id/authorLibrary"
@@ -91,7 +100,8 @@
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/authorLibrary"
         app:layout_constraintStart_toEndOf="@+id/authorLibrary"
-        app:layout_constraintTop_toTopOf="@+id/authorLibrary" />
+        app:layout_constraintTop_toTopOf="@+id/authorLibrary"
+        tools:ignore="LabelFor" />
 
     <TextView
         android:id="@+id/photoLibrary"
@@ -130,17 +140,17 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:text="Please scan the code: "
-        app:layout_constraintBottom_toBottomOf="@+id/button3"
+        app:layout_constraintBottom_toBottomOf="@+id/scanPhoto"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/button3" />
+        app:layout_constraintTop_toTopOf="@+id/scanPhoto" />
 
     <Button
-        android:id="@+id/button3"
-        android:layout_width="95dp"
+        android:id="@+id/scanPhoto"
+        android:layout_width="100dp"
         android:layout_height="30dp"
         android:layout_marginTop="15dp"
         android:text="scan Code"
-        android:textSize="8dp"
+        android:textSize="8sp"
         app:layout_constraintStart_toStartOf="@+id/cameraPhoto"
         app:layout_constraintTop_toBottomOf="@+id/cameraPhoto" />
 

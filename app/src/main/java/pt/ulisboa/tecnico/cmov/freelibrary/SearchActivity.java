@@ -1,22 +1,17 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import pt.ulisboa.tecnico.cmov.freelibrary.Book;
 
 public class SearchActivity extends AppCompatActivity {
 
@@ -25,38 +20,57 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        //Define the book search bar
         List<Book> bookList = new ArrayList<>();
-
-        Button searchButton = (Button) findViewById(R.id.mapMenu);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(SearchActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-
         SearchView searchView = findViewById(R.id.searchView);
+
+        Book book1 = new Book(0, "Les Miserables", "Victor Hugo");
+        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine");
+        bookList.add(book1);
+        bookList.add(book2);
+
+        List<String> titles =  bookList.stream().map(Book::getTitle).collect(Collectors.toList());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(SearchActivity.this, android.R.layout.simple_list_item_1, titles);
+        ListView listView = findViewById(R.id.listBooks);
+        listView.setAdapter(adapter);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 /* Server Request */
 
-                Book book1 = new Book(0, "Les Misérables", "Victor Hugo", "0");
-                Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "1");
-                bookList.add(book1);
-                bookList.add(book2);
+                //Virtually generated for the moment => Send by server in the future
+                if (query.equals("Les Miserables") || query.equals("Victor Hugo")){
 
-                List<String> titles =  bookList.stream().map(Book::getTitle).collect(Collectors.toList());;
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(SearchActivity.this, android.R.layout.simple_list_item_1, titles);
-                ListView listView = findViewById(R.id.listBooks);
-                listView.setAdapter(adapter);
+                    List<Book> searchList = new ArrayList<>();
+                    Book book = new Book(0, "Les Miserables", "Victor Hugo");
+                    searchList.add(book);
+                    List<String> searchTitles =  searchList.stream().map(Book::getTitle).collect(Collectors.toList());
+                    ArrayAdapter<String> searchAdapter = new ArrayAdapter<>(SearchActivity.this, android.R.layout.simple_list_item_1, searchTitles);
+                    listView.setAdapter(searchAdapter);
 
+                } else if (query.equals("Les Fables de La Fontaine") || query.equals("De La Fontaine")){
+
+                    List<Book> searchList = new ArrayList<>();
+                    Book book = new Book(1, "Les Fables de La Fontaine", "De La Fontaine");
+                    searchList.add(book);
+                    List<String> searchTitles =  searchList.stream().map(Book::getTitle).collect(Collectors.toList());
+                    ArrayAdapter<String> searchAdapter = new ArrayAdapter<>(SearchActivity.this, android.R.layout.simple_list_item_1, searchTitles);
+                    listView.setAdapter(searchAdapter);
+
+                } else{
+
+                    List<Book> searchList = new ArrayList<>();
+                    List<String> searchTitles =  searchList.stream().map(Book::getTitle).collect(Collectors.toList());
+                    ArrayAdapter<String> searchAdapter = new ArrayAdapter<>(SearchActivity.this, android.R.layout.simple_list_item_1, searchTitles);
+                    listView.setAdapter(searchAdapter);
+
+                }
                 searchView.clearFocus();
 
                 return false;
             }
-
+            //We can adapt the code if the text is changed, not implemented for the moment as we didn't link with server
             @Override
             public boolean onQueryTextChange(String newText) {
                 /* Nothing for the moment */
@@ -64,17 +78,21 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-        ListView listBooks = findViewById(R.id.listBooks);
-        listBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Book book = bookList.get(position);
-                Intent intent = new Intent(SearchActivity.this, BookInfo.class);
-                intent.putExtra("id", book.getId());
-                intent.putExtra("title", book.getTitle());
-                intent.putExtra("author", book.getAuthor());
-                startActivity(intent);
-            }
+        //Define the book list
+        listView.setOnItemClickListener((adapterView, view, position, id) -> {
+            Book book = bookList.get(position);
+            Intent intent = new Intent(SearchActivity.this, BookInfo.class);
+            intent.putExtra("id", book.getId());
+            intent.putExtra("title", book.getTitle());
+            intent.putExtra("author", book.getAuthor());
+            startActivity(intent);
+        });
+
+        //Define Map Buttons
+        Button mapButton = (Button) findViewById(R.id.mapMenu);
+        mapButton.setOnClickListener(view -> {
+            Intent intent = new Intent(SearchActivity.this, MainActivity.class);
+            startActivity(intent);
         });
 
     }

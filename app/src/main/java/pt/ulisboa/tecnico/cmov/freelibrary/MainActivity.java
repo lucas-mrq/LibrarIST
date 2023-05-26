@@ -4,36 +4,62 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import pt.ulisboa.tecnico.cmov.freelibrary.databinding.ActivityMainBinding;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        Button searchButton = (Button) findViewById(R.id.searchMenu);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                startActivity(intent);
-            }
+        //Temporary Button that lead to a virtual library
+        Button testButton = findViewById(R.id.testLibrary);
+        testButton.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, LibraryInfo.class);
+            intent.putExtra("favorite", false);
+            intent.putExtra("name", "Library Test");
+            intent.putExtra("address", "48 Av de la Republic Lisbon, Portugal");
+            startActivity(intent);
         });
 
-        Button testButton = (Button) findViewById(R.id.testLibrary);
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, LibraryInfo.class);
-                intent.putExtra("favorite", false);
-                intent.putExtra("name", "Library Test");
-                intent.putExtra("address", "4 rue Saint Verny, 63800 Cournon d'Auvergne, France");
-                startActivity(intent);
-            }
+        //Define the Map in background
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        assert mapFragment != null;
+        mapFragment.getMapAsync(this);
+
+        //Define Search Buttons
+        Button searchButton = findViewById(R.id.searchMenu);
+        searchButton.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+            startActivity(intent);
         });
+    }
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        // Add a marker in Sydney and move the camera
+        LatLng ist = new LatLng(38.73700328494339, -9.13864062991242);
+        googleMap.addMarker(new MarkerOptions().position(ist).title("Marker in Sydney"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ist));
     }
 }

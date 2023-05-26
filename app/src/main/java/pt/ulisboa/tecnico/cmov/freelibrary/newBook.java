@@ -1,23 +1,17 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.Manifest;
 
-
-import java.io.File;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class newBook extends AppCompatActivity {
 
@@ -28,12 +22,13 @@ public class newBook extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_book);
 
+        //Define Library Name
         Intent intent = getIntent();
-
         String libraryName = intent.getStringExtra("library");
         TextView libraryText = (TextView) findViewById(R.id.libraryBook);
         libraryText.setText(libraryName);
 
+        //Stored photo
         imagePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -42,23 +37,32 @@ public class newBook extends AppCompatActivity {
                 }
             });
 
+        //Define the Select Photo button
         Button filePhotoButton = (Button) findViewById(R.id.filePhoto);
-        filePhotoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        filePhotoButton.setOnClickListener(view -> {
 
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image/*");
+            Intent intent1 = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent1.setType("image/*");
 
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    imagePickerLauncher.launch(intent);
-                    Button fileButton = (Button) findViewById(R.id.filePhoto);
-                    fileButton.setText("photo taken");
-                } else {
-                    Button fileButton = (Button) findViewById(R.id.filePhoto);
-                    fileButton.setText("try again");
-                }
+            if (intent1.resolveActivity(getPackageManager()) != null) {
+                imagePickerLauncher.launch(intent1);
+                filePhotoButton.setText("photo taken");
+            } else {
+                filePhotoButton.setText("try again");
             }
+        });
+
+        //Define Map & Search Buttons
+        Button mapButton = (Button) findViewById(R.id.mapMenuNewBook);
+        mapButton.setOnClickListener(view -> {
+            Intent intent1 = new Intent(newBook.this, MainActivity.class);
+            startActivity(intent1);
+        });
+
+        Button searchButton = (Button) findViewById(R.id.searchMenuNewBook);
+        searchButton.setOnClickListener(view -> {
+            Intent intent12 = new Intent(newBook.this, SearchActivity.class);
+            startActivity(intent12);
         });
     }
 }
