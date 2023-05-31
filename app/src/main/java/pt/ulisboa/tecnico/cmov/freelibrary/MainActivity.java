@@ -11,17 +11,33 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.List;
+
+import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.databinding.ActivityMainBinding;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
+import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private GoogleMap mGoogleMap;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        //Instantiate ApiService
+        apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+
 
         //Temporary Button that lead to a virtual library
         Button testButton = findViewById(R.id.testLibrary);
@@ -56,10 +72,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
+        fetchLibraries();
+    }
 
-        // Add a marker in Sydney and move the camera
-        LatLng ist = new LatLng(38.73700328494339, -9.13864062991242);
-        googleMap.addMarker(new MarkerOptions().position(ist).title("Marker in Sydney"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ist));
+    private void fetchLibraries() {
+        apiService.getAllLibraries().enqueue(new Callback<List<Library>>() {
+            @Override
+            public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
+                if (response.isSuccessful()) {
+                    List<Library> libraries = response.body();
+                    for (Library library : libraries) {
+                        LatLng libraryLocation = new LatLng(library.latitude, library.longitude);
+                        mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Library>> call, Throwable t) {
+                // Handle error here
+                t.printStackTrace();
+            }
+        });
     }
 }
