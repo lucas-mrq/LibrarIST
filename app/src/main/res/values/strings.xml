@@ -2,5 +2,4 @@
     <string name="app_name">FreeLibrary</string>
     <string name="search">Search</string>
     <string name="map">Map</string>
-    <string name="title_activity_check_in">CheckIn</string>
 </resources>
