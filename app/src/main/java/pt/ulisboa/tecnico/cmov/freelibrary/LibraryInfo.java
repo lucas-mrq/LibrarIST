@@ -47,8 +47,8 @@ public class LibraryInfo extends AppCompatActivity {
 
         //Temporary list => Will be send by server in the future
         List<Book> bookList = new ArrayList<>();
-        Book book1 = new Book(0, "Les Miserables", "Victor Hugo");
-        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine");
+        Book book1 = new Book(0, "Les Miserables", "Victor Hugo", "french");
+        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "french");
         bookList.add(book1);
         bookList.add(book2);
         List<String> titles =  bookList.stream().map(Book::getTitle).collect(Collectors.toList());
@@ -63,6 +63,7 @@ public class LibraryInfo extends AppCompatActivity {
             intent1.putExtra("id", book.getId());
             intent1.putExtra("title", book.getTitle());
             intent1.putExtra("author", book.getAuthor());
+            intent1.putExtra("language", book.getLanguage());
             startActivity(intent1);
         });
 

@@ -18,11 +18,14 @@ public class BookInfo extends AppCompatActivity {
         Intent intent = getIntent();
         String title = intent.getStringExtra("title");
         String author = intent.getStringExtra("author");
+        String language = intent.getStringExtra("language");
 
         TextView titleText = (TextView) findViewById(R.id.bookTitle);
         TextView authorText = (TextView) findViewById(R.id.bookAuthor);
+        TextView languageText = (TextView) findViewById(R.id.bookLanguage);
         titleText.setText(title);
         authorText.setText(author);
+        languageText.setText(language);
 
         //Define Map & Search Buttons
         Button mapButton = (Button) findViewById(R.id.mapMenuBook);

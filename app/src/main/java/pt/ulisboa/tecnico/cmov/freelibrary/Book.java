@@ -5,10 +5,13 @@ public class Book {
     private String title;
     private String author;
 
-    public Book(int id, String title, String author) {
+    private String language;
+
+    public Book(int id, String title, String author, String language) {
         this.id = id;
         this.title = title;
         this.author = author;
+        this.language = language;
     }
 
     public int getId() {
@@ -23,9 +26,14 @@ public class Book {
         return title;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
     public String getAuthor() {
         return author;
     }
+
 
 }
 
