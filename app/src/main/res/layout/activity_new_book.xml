@@ -46,7 +46,16 @@
         app:layout_constraintTop_toBottomOf="@+id/bookName" />
 
     <TextView
-        android:id="@+id/libraryBook"
+        android:id="@+id/codeBarSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="0"
+        app:layout_constraintStart_toEndOf="@+id/codeLibrary"
+        app:layout_constraintTop_toTopOf="@+id/codeLibrary" />
+
+    <TextView
+        android:id="@+id/libraryBook2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
@@ -89,6 +98,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bookLibrary" />
 
+    <TextView
+        android:id="@+id/codeLibrary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Code Bar: "
+        app:layout_constraintStart_toStartOf="@+id/authorLibrary"
+        app:layout_constraintTop_toBottomOf="@+id/authorLibrary" />
+
     <EditText
         android:id="@+id/authorBook"
         android:layout_width="wrap_content"
@@ -111,47 +129,37 @@
         android:layout_marginTop="30dp"
         android:text="Please select book picture:"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/authorLibrary" />
+        app:layout_constraintTop_toBottomOf="@+id/codeLibrary" />
 
     <Button
-        android:id="@+id/filePhoto"
+        android:id="@+id/cameraPhoto"
         android:layout_width="100dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
-        android:text="from File"
+        android:text="from Camera"
         android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="@+id/photoLibrary"
         app:layout_constraintStart_toEndOf="@+id/photoLibrary"
         app:layout_constraintTop_toTopOf="@+id/photoLibrary" />
 
     <Button
-        android:id="@+id/cameraPhoto"
+        android:id="@+id/filePhoto"
         android:layout_width="100dp"
         android:layout_height="30dp"
         android:layout_marginTop="15dp"
-        android:text="from Camera"
-        android:textSize="8sp"
-        app:layout_constraintStart_toStartOf="@+id/filePhoto"
-        app:layout_constraintTop_toBottomOf="@+id/filePhoto" />
-
-    <TextView
-        android:id="@+id/scanLibrary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:text="Please scan the code: "
-        app:layout_constraintBottom_toBottomOf="@+id/scanPhoto"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/scanPhoto" />
-
-    <Button
-        android:id="@+id/scanPhoto"
-        android:layout_width="100dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="15dp"
-        android:text="scan Code"
+        android:text="from File"
         android:textSize="8sp"
         app:layout_constraintStart_toStartOf="@+id/cameraPhoto"
         app:layout_constraintTop_toBottomOf="@+id/cameraPhoto" />
+
+    <ImageView
+        android:id="@+id/bookImage"
+        android:layout_width="283dp"
+        android:layout_height="186dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filePhoto"
+        app:srcCompat="@drawable/exemple" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
