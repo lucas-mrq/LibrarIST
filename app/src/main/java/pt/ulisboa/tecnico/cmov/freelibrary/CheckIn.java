@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.Editable;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -28,12 +27,10 @@ import com.google.mlkit.vision.common.InputImage;
 
 import java.util.List;
 
-public class newBook extends AppCompatActivity {
+public class CheckIn extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private ActivityResultLauncher<Intent> imageScan;
-    private ActivityResultLauncher<Intent> imageBook;
-
     private String handleImagePickerResult(Intent data) {
         if (data != null) {
             Uri imageUri = data.getData();
@@ -62,32 +59,32 @@ public class newBook extends AppCompatActivity {
                     if (barcodes.size() > 0) {
                         Barcode barcode = barcodes.get(0);
                         String codeResult = barcode.getRawValue();
-                        EditText scanText = findViewById(R.id.editScan);
+                        EditText scanText = findViewById(R.id.codeBar);
                         scanText.setText(codeResult);
                     } else {
-                        EditText scanText = findViewById(R.id.editScan);
+                        EditText scanText = findViewById(R.id.codeBar);
                         scanText.setText("No barcode found");
                     }
                 })
                 .addOnFailureListener(e -> {
                     e.printStackTrace();
-                    EditText scanText = findViewById(R.id.editScan);
+                    EditText scanText = findViewById(R.id.codeBar);
                     scanText.setText("Failed to detect barcode");
                 });
 
-        EditText scanText = findViewById(R.id.editScan);
+        EditText scanText = findViewById(R.id.codeBar);
         return String.valueOf(scanText.getText());
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_book);
+        setContentView(R.layout.activity_check_in);
 
         //Define Library Name
         Intent intent = getIntent();
         String libraryName = intent.getStringExtra("library");
-        TextView libraryText = findViewById(R.id.libraryBook);
+        TextView libraryText = findViewById(R.id.libraryBookName);
         libraryText.setText(libraryName);
 
         imageScan = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -95,12 +92,12 @@ public class newBook extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                         handleImagePickerResult(result.getData());
                         //Define the Select Photo button
-                        EditText scanText = findViewById(R.id.editScan);
+                        EditText scanText = findViewById(R.id.codeBar);
                         scanText.setText(handleImagePickerResult(result.getData()));
                     }
                 });
 
-        Button fileScanButton = findViewById(R.id.codeFile);
+        Button fileScanButton = findViewById(R.id.fileButton);
         fileScanButton.setOnClickListener(view -> {
             Intent intentFilePhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             intentFilePhoto.setType("image/*");
@@ -108,16 +105,16 @@ public class newBook extends AppCompatActivity {
             if (intentFilePhoto.resolveActivity(getPackageManager()) != null) {
                 imageScan.launch(intentFilePhoto);
             } else {
-                EditText scanText = findViewById(R.id.editScan);
+                EditText scanText = findViewById(R.id.codeBar);
                 scanText.setText("Write it");
             }
         });
 
-        Button cameraScanButton = findViewById(R.id.codeCamera);
+        Button cameraScanButton = findViewById(R.id.cameraButton);
         cameraScanButton.setOnClickListener(view -> {
             // Demander la permission CAMERA
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             } else {
                 Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -127,51 +124,26 @@ public class newBook extends AppCompatActivity {
             }
         });
 
-        imageBook = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Intent data = result.getData();
-                if (data != null) {
-                    Uri uri = data.getData();
-                    ImageView bookImage = findViewById(R.id.bookImage);
-                    bookImage.setImageURI(uri);
-                }
-            }
-        });
-
-        Button fileBookButton = findViewById(R.id.filePhoto);
-        fileBookButton.setOnClickListener(view -> {
-            Intent intentFilePhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intentFilePhoto.setType("image/*");
-
-            if (intentFilePhoto.resolveActivity(getPackageManager()) != null) {
-                imageBook.launch(intentFilePhoto);
-            }
-        });
-
-        Button cameraBookButton = findViewById(R.id.cameraPhoto);
-        cameraBookButton.setOnClickListener(view -> {
-            // Ask CAMERA permission
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-            } else {
-                Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                if (intentCamera.resolveActivity(getPackageManager()) != null) {
-                    imageBook.launch(intentCamera);
-                }
-            }
+        //Define Map & Search Buttons
+        Button checkInButton = findViewById(R.id.checkInRegisterButton);
+        checkInButton.setOnClickListener(view -> {
+            Intent intent12 = new Intent(CheckIn.this, NewBook.class);
+            intent12.putExtra("library", libraryName);
+            EditText scanText = findViewById(R.id.codeBar);
+            intent12.putExtra("code", String.valueOf(scanText.getText()));
+            startActivity(intent12);
         });
 
         //Define Map & Search Buttons
-        Button mapButton = findViewById(R.id.mapMenuNewBook);
+        Button mapButton = findViewById(R.id.mapMenuCheckIn);
         mapButton.setOnClickListener(view -> {
-            Intent intentMain = new Intent(newBook.this, MainActivity.class);
+            Intent intentMain = new Intent(CheckIn.this, MainActivity.class);
             startActivity(intentMain);
         });
 
-        Button searchButton = findViewById(R.id.searchMenuNewBook);
+        Button searchButton = findViewById(R.id.searchMenuCheckIn);
         searchButton.setOnClickListener(view -> {
-            Intent intentSearch = new Intent(newBook.this, SearchActivity.class);
+            Intent intentSearch = new Intent(CheckIn.this, SearchActivity.class);
             startActivity(intentSearch);
         });
     }
@@ -188,7 +160,7 @@ public class newBook extends AppCompatActivity {
                 }
             } else {
                 // Cannot open
-                EditText scanText = findViewById(R.id.editScan);
+                EditText scanText = findViewById(R.id.codeBar);
                 scanText.setText("Write it");
             }
         }
