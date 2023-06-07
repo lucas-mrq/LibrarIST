@@ -2,11 +2,18 @@ package pt.ulisboa.tecnico.cmov.freelibrary.api;
 
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import retrofit2.Call;
 import retrofit2.http.*;
 
 public interface ApiService {
+    @GET("api/books/{id}")
+    Call<Book> getBookById(@Path("id") int id);
+
+    @GET("api/books/library/{id}")
+    Call<List<Book>> getBooksByLibraryId(@Path("id") int id);
+
     @GET("api/libraries/{id}")
     Call<Library> getLibraryById(@Path("id") int id);
 

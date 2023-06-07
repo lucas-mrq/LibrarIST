@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
+
 public class SearchActivity extends AppCompatActivity {
 
     @Override
