@@ -24,10 +24,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, LibraryClickListener {
 
     private GoogleMap mGoogleMap;
     private ApiService apiService;
+
+    private List<Library> libraries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +44,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Temporary Button that lead to a virtual library
         Button testButton = findViewById(R.id.testLibrary);
         testButton.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, LibraryInfo.class);
-            intent.putExtra("favorite", false);
-            intent.putExtra("name", "Library Test");
-            intent.putExtra("address", "48 Av de la Republic Lisbon, Portugal");
-            startActivity(intent);
+            onLibraryClick(false, "Library Test", "48 Av de la Republic Lisbon, Portugal", 1);
         });
 
         //Define the Map in background
@@ -73,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+        mGoogleMap.setOnMarkerClickListener(this);
         fetchLibraries();
     }
 
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
                 if (response.isSuccessful()) {
-                    List<Library> libraries = response.body();
+                    libraries = response.body();
                     for (Library library : libraries) {
                         LatLng libraryLocation = new LatLng(library.latitude, library.longitude);
                         mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
@@ -95,5 +94,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 t.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void onLibraryClick(boolean isFavorite, String name, String address, int libraryId) {
+        Intent intent = new Intent(MainActivity.this, LibraryInfo.class);
+        intent.putExtra("favorite", isFavorite);
+        intent.putExtra("name", name);
+        intent.putExtra("address", address);
+        intent.putExtra("libraryId", libraryId);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Library library = getLibraryFromMarker(marker);
+        if (library != null) {
+            onLibraryClick(false, library.name, "address", library.getId());
+        }
+        return true;
+    }
+
+    private Library getLibraryFromMarker(Marker marker) {
+        String markerTitle = marker.getTitle();
+        for (Library library : libraries) {
+            if (library.getName().equals(markerTitle)) {
+                return library;
+            }
+        }
+        return null;
     }
 }

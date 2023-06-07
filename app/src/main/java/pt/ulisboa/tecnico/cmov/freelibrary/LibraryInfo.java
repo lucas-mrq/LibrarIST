@@ -28,6 +28,7 @@ import retrofit2.Response;
 public class LibraryInfo extends AppCompatActivity {
 
     private ApiService apiService;
+    private int libraryId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class LibraryInfo extends AppCompatActivity {
         //Get Library Name
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
+        libraryId = intent.getIntExtra("libraryId",1 );
         TextView titleText = (TextView) findViewById(R.id.libraryName);
         titleText.setText(name);
 
@@ -61,7 +63,7 @@ public class LibraryInfo extends AppCompatActivity {
         });
 
 
-        fetchBooks(1, new BooksCallback() {
+        fetchBooks(libraryId, new BooksCallback() {
             @Override
             public void onBooksFetched(List<Book> books) {
                 // Handle the fetched books
