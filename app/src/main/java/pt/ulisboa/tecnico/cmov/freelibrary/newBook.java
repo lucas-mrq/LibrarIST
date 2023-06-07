@@ -18,12 +18,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.RGBLuminanceSource;
-import com.google.zxing.Result;
-import com.google.zxing.common.HybridBinarizer;
-import com.google.zxing.LuminanceSource;
+import com.google.android.gms.tasks.Task;
+import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.common.InputImage;
+
+import java.util.List;
 
 public class newBook extends AppCompatActivity {
 
@@ -36,22 +38,7 @@ public class newBook extends AppCompatActivity {
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-
-                ImageView bookImage = findViewById(R.id.bookImage);
-                bookImage.setImageBitmap(bitmap);
-
-                int[] intArray = new int[bitmap.getWidth() * bitmap.getHeight()];
-                bitmap.getPixels(intArray, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-                LuminanceSource source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), intArray);
-                BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
-
-                MultiFormatReader reader = new MultiFormatReader();
-
-                Result codeResult = reader.decode(binaryBitmap);
-
-                return codeResult.getText();
-
+                getPictureCode(bitmap);
             } catch (Exception e) {
                 e.printStackTrace();
                 return "Write it";
@@ -59,6 +46,34 @@ public class newBook extends AppCompatActivity {
         } else {
             return "Write it";
         }
+        return null;
+    }
+
+    private void getPictureCode(Bitmap imageCode) {
+        InputImage image = InputImage.fromBitmap(imageCode, 0);
+        BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                        .build();
+        BarcodeScanner scanner = BarcodeScanning.getClient(options);
+
+        Task<List<Barcode>> result = scanner.process(image)
+                .addOnSuccessListener(barcodes -> {
+                    if (barcodes.size() > 0) {
+                        Barcode barcode = barcodes.get(0);
+                        String codeResult = barcode.getRawValue();
+                        EditText scanText = findViewById(R.id.editScan);
+                        scanText.setText(codeResult);
+                    } else {
+                        EditText scanText = findViewById(R.id.editScan);
+                        scanText.setText("No barcode found");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    e.printStackTrace();
+                    EditText scanText = findViewById(R.id.editScan);
+                    scanText.setText("Failed to detect barcode");
+                });
     }
 
     @Override
@@ -97,7 +112,7 @@ public class newBook extends AppCompatActivity {
 
         Button cameraScanButton = findViewById(R.id.codeCamera);
         cameraScanButton.setOnClickListener(view -> {
-            // Demander la permission CAMERA
+            // Ask CAMERA permission
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             } else {
