@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -38,7 +39,7 @@ public class newBook extends AppCompatActivity {
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                getPictureCode(bitmap);
+                return getPictureCode(bitmap);
             } catch (Exception e) {
                 e.printStackTrace();
                 return "Write it";
@@ -46,10 +47,9 @@ public class newBook extends AppCompatActivity {
         } else {
             return "Write it";
         }
-        return null;
     }
 
-    private void getPictureCode(Bitmap imageCode) {
+    private String getPictureCode(Bitmap imageCode) {
         InputImage image = InputImage.fromBitmap(imageCode, 0);
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
@@ -74,6 +74,9 @@ public class newBook extends AppCompatActivity {
                     EditText scanText = findViewById(R.id.editScan);
                     scanText.setText("Failed to detect barcode");
                 });
+
+        EditText scanText = findViewById(R.id.editScan);
+        return String.valueOf(scanText.getText());
     }
 
     @Override
@@ -112,7 +115,7 @@ public class newBook extends AppCompatActivity {
 
         Button cameraScanButton = findViewById(R.id.codeCamera);
         cameraScanButton.setOnClickListener(view -> {
-            // Ask CAMERA permission
+            // Demander la permission CAMERA
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             } else {
@@ -147,7 +150,7 @@ public class newBook extends AppCompatActivity {
 
         Button cameraBookButton = findViewById(R.id.cameraPhoto);
         cameraBookButton.setOnClickListener(view -> {
-            // Demander la permission CAMERA
+            // Ask CAMERA permission
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             } else {
@@ -191,4 +194,3 @@ public class newBook extends AppCompatActivity {
         }
     }
 }
-
