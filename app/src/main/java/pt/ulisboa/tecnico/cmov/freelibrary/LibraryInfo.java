@@ -11,6 +11,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,8 +52,8 @@ public class LibraryInfo extends AppCompatActivity {
 
         //Temporary list => Will be send by server in the future
         List<Book> bookList = new ArrayList<>();
-        Book book1 = new Book(0, "Les Miserables", "Victor Hugo", "french");
-        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "french");
+        Book book1 = new Book(0, "Les Miserables", "Victor Hugo", "french", R.drawable.les_miserables_cover);
+        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "french", R.drawable.fables_cover);
         bookList.add(book1);
         bookList.add(book2);
         List<String> titles =  bookList.stream().map(Book::getTitle).collect(Collectors.toList());
@@ -59,11 +64,13 @@ public class LibraryInfo extends AppCompatActivity {
         listBooks.setAdapter(adapter);
         listBooks.setOnItemClickListener((adapterView, view, position, id) -> {
             Book book = bookList.get(position);
+
             Intent intent1 = new Intent(LibraryInfo.this, BookInfo.class);
             intent1.putExtra("id", book.getId());
             intent1.putExtra("title", book.getTitle());
             intent1.putExtra("author", book.getAuthor());
             intent1.putExtra("language", book.getLanguage());
+            intent1.putExtra("image", book.getImage());
             startActivity(intent1);
         });
 

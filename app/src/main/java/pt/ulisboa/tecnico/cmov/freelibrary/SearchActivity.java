@@ -24,8 +24,8 @@ public class SearchActivity extends AppCompatActivity {
         List<Book> bookList = new ArrayList<>();
         SearchView searchView = findViewById(R.id.searchView);
 
-        Book book1 = new Book(0, "Les Miserables", "Victor Hugo", "french");
-        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "french");
+        Book book1 = new Book(0, "Les Miserables", "Victor Hugo", "french", R.drawable.les_miserables_cover);
+        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "french", R.drawable.fables_cover);
         bookList.add(book1);
         bookList.add(book2);
 
@@ -43,7 +43,7 @@ public class SearchActivity extends AppCompatActivity {
                 if (query.equals("Les Miserables") || query.equals("Victor Hugo")){
 
                     List<Book> searchList = new ArrayList<>();
-                    Book book = new Book(0, "Les Miserables", "Victor Hugo", "french");
+                    Book book = new Book(0, "Les Miserables", "Victor Hugo", "french", R.drawable.les_miserables_cover);
                     searchList.add(book);
                     List<String> searchTitles =  searchList.stream().map(Book::getTitle).collect(Collectors.toList());
                     ArrayAdapter<String> searchAdapter = new ArrayAdapter<>(SearchActivity.this, android.R.layout.simple_list_item_1, searchTitles);
@@ -52,7 +52,7 @@ public class SearchActivity extends AppCompatActivity {
                 } else if (query.equals("Les Fables de La Fontaine") || query.equals("De La Fontaine")){
 
                     List<Book> searchList = new ArrayList<>();
-                    Book book = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "french");
+                    Book book = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "french", R.drawable.fables_cover);
                     searchList.add(book);
                     List<String> searchTitles =  searchList.stream().map(Book::getTitle).collect(Collectors.toList());
                     ArrayAdapter<String> searchAdapter = new ArrayAdapter<>(SearchActivity.this, android.R.layout.simple_list_item_1, searchTitles);

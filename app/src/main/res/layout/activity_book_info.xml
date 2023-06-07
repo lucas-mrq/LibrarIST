@@ -84,7 +84,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textAuthor" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/cover"
         android:layout_width="172dp"
         android:layout_height="278dp"
         android:layout_marginEnd="15dp"
@@ -102,7 +102,7 @@
         android:textStyle="bold"
         app:autoSizeTextType="uniform"
         app:layout_constraintStart_toStartOf="@+id/textLanguage"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/cover" />
 
     <ListView
         android:id="@+id/listofLibraryWhereBookAvailable"
@@ -113,6 +113,15 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/Availability"
         app:layout_constraintTop_toBottomOf="@+id/Availability" />
+
+    <ImageView
+        android:id="@+id/notifications"
+        android:layout_width="40dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="@+id/textLanguage"
+        app:layout_constraintTop_toBottomOf="@+id/textLanguage"
+        app:srcCompat="@drawable/notifications_off" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
