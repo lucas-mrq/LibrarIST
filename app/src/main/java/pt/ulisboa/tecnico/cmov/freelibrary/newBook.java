@@ -1,17 +1,13 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
+import android.Manifest;
 import android.app.Activity;
-
 import android.content.Intent;
-
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-
 import android.net.Uri;
-
 import android.os.Bundle;
-
 import android.provider.MediaStore;
-
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,8 +15,8 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.MultiFormatReader;
@@ -31,6 +27,7 @@ import com.google.zxing.LuminanceSource;
 
 public class newBook extends AppCompatActivity {
 
+    private static final int REQUEST_CAMERA_PERMISSION = 1;
     private ActivityResultLauncher<Intent> imageScan;
     private ActivityResultLauncher<Intent> imageBook;
 
@@ -100,13 +97,15 @@ public class newBook extends AppCompatActivity {
 
         Button cameraScanButton = findViewById(R.id.codeCamera);
         cameraScanButton.setOnClickListener(view -> {
-            Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-            if (intentCamera.resolveActivity(getPackageManager()) != null) {
-                imageScan.launch(intentCamera);
+            // Demander la permission CAMERA
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             } else {
-                EditText scanText = findViewById(R.id.editScan);
-                scanText.setText("Write it");
+                Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                if (intentCamera.resolveActivity(getPackageManager()) != null) {
+                    imageScan.launch(intentCamera);
+                }
             }
         });
 
@@ -133,10 +132,15 @@ public class newBook extends AppCompatActivity {
 
         Button cameraBookButton = findViewById(R.id.cameraPhoto);
         cameraBookButton.setOnClickListener(view -> {
-            Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            // Demander la permission CAMERA
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            } else {
+                Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-            if (intentCamera.resolveActivity(getPackageManager()) != null) {
-                imageBook.launch(intentCamera);
+                if (intentCamera.resolveActivity(getPackageManager()) != null) {
+                    imageBook.launch(intentCamera);
+                }
             }
         });
 
@@ -153,4 +157,23 @@ public class newBook extends AppCompatActivity {
             startActivity(intentSearch);
         });
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Open Camera
+                Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intentCamera.resolveActivity(getPackageManager()) != null) {
+                    imageScan.launch(intentCamera);
+                }
+            } else {
+                // Cannot open
+                EditText scanText = findViewById(R.id.editScan);
+                scanText.setText("Write it");
+            }
+        }
+    }
 }
+
