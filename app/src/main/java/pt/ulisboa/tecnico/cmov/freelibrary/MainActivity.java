@@ -11,6 +11,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         LatLng libraryLocation = new LatLng(library.latitude, library.longitude);
                         mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
                     }
+                    zoomToMarkers(); // Call zoomToMarkers after adding markers
                 }
             }
 
@@ -94,6 +96,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 t.printStackTrace();
             }
         });
+    }
+
+    private void zoomToMarkers() {
+        if (libraries == null || libraries.isEmpty()) {
+            return;
+        }
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (Library library : libraries) {
+            LatLng libraryLocation = new LatLng(library.latitude, library.longitude);
+            builder.include(libraryLocation);
+        }
+        LatLngBounds bounds = builder.build();
+        int padding = 100; // Adjust the padding as needed
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
     }
 
     @Override
