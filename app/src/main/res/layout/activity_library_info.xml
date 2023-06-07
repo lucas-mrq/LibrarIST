@@ -10,50 +10,53 @@
         android:id="@+id/buttonLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_horizontal"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/mapMenuLibrary"
             android:layout_width="150dp"
             android:layout_height="39dp"
-            android:layout_marginBottom="15dp"
             android:layout_marginEnd="15dp"
+            android:layout_marginBottom="15dp"
             android:text="@string/map" />
 
         <Button
             android:id="@+id/searchMenuLibrary"
             android:layout_width="150dp"
             android:layout_height="39dp"
-            android:layout_marginBottom="15dp"
             android:layout_marginStart="15dp"
+            android:layout_marginBottom="15dp"
             android:text="@string/search" />
 
     </LinearLayout>
 
     <ListView
         android:id="@+id/listBooks"
-        android:layout_width="365dp"
-        android:layout_height="350dp"
+        android:layout_width="371dp"
+        android:layout_height="195dp"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/favoriteButton" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
     <TextView
         android:id="@+id/libraryName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:text="libraryName"
+        android:textSize="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/library_location"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/favoriteButton"
@@ -67,19 +70,10 @@
 
     <Button
         android:id="@+id/itineraryButton"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginStart="15dp"
-        android:text="itineraryButton"
-        app:layout_constraintBottom_toTopOf="@+id/buttonLayout"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/photoButton"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="141dp"
+        android:layout_height="67dp"
         android:layout_marginEnd="15dp"
-        android:text="photoButton"
+        android:text="itineraryButton"
         app:layout_constraintBottom_toTopOf="@+id/buttonLayout"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -87,29 +81,48 @@
         android:id="@+id/inButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginBottom="15dp"
         android:text="Check-In"
-        app:layout_constraintBottom_toTopOf="@+id/itineraryButton"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintTop_toTopOf="@+id/imageView5" />
 
     <Button
         android:id="@+id/outButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
         android:text="Check-Out"
-        app:layout_constraintBottom_toTopOf="@+id/photoButton"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintTop_toBottomOf="@+id/inButton" />
 
-    <Button
-        android:id="@+id/donateButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
-        android:text="Donate"
-        app:layout_constraintBottom_toTopOf="@+id/itineraryButton"
-        app:layout_constraintEnd_toStartOf="@+id/outButton"
-        app:layout_constraintStart_toEndOf="@+id/inButton" />
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="190dp"
+        android:layout_height="114dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="@+id/imageView6"
+        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+        app:srcCompat="@drawable/free_library_example" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="342dp"
+        android:layout_height="209dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/library_location"
+        app:srcCompat="@drawable/fake_map" />
+
+    <TextView
+        android:id="@+id/library_location"
+        android:layout_width="284dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:text="Address: 48 Av da Republica Lisbon, Portugal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/libraryName" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
