@@ -93,11 +93,11 @@ public class LibraryInfo extends AppCompatActivity {
             }
         });
 
-        //Define new Book button => Will change to a scan parameter if book is unknown
+        //Define check-in button
         Button checkInButton = (Button) findViewById(R.id.inButton);
         checkInButton.setOnClickListener(view -> {
-            Intent intent12 = new Intent(LibraryInfo.this, newBook.class);
-            intent12.putExtra("library", name);
+            Intent intentCheckIn = new Intent(LibraryInfo.this, CheckIn.class);
+            intentCheckIn.putExtra("library", name);
             startActivity(intent12);
         });
 
