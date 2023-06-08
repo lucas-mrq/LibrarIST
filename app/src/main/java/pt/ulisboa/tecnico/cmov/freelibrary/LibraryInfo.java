@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,17 +11,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
-import pt.ulisboa.tecnico.cmov.freelibrary.api.BookCallback;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.BooksCallback;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
