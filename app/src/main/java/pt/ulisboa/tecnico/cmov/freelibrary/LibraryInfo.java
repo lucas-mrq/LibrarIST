@@ -71,7 +71,7 @@ public class LibraryInfo extends AppCompatActivity {
         checkInButton.setOnClickListener(view -> {
             Intent intentCheckIn = new Intent(LibraryInfo.this, CheckIn.class);
             intentCheckIn.putExtra("library", name);
-            startActivity(intent12);
+            startActivity(intentCheckIn);
         });
 
         //Define Google Map itinerary Button

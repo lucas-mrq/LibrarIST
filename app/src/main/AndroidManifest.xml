@@ -25,7 +25,7 @@
         <activity
             android:name=".CheckIn"
             android:exported="false"
-            android:label="@string/title_activity_check_in"
+            android:label="CheckIn"
             android:theme="@style/Theme.FreeLibrary" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
