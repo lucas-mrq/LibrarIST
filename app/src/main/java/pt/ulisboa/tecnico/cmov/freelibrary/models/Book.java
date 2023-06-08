@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.freelibrary;
+package pt.ulisboa.tecnico.cmov.freelibrary.models;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -7,9 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Book {
-    private int id;
-    private String title;
-    private String author;
+    public int id;
+    public String title;
+    public String author;
+    public String isbn;
 
     private String language;
 
@@ -44,7 +45,4 @@ public class Book {
     public String getAuthor() {
         return author;
     }
-
-
 }
-

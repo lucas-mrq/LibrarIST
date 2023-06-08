@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -20,29 +21,45 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.api.BookCallback;
+import pt.ulisboa.tecnico.cmov.freelibrary.api.BooksCallback;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
+import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LibraryInfo extends AppCompatActivity {
+
+    private ApiService apiService;
+    private int libraryId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_info);
 
+        //Instantiate ApiService
+        apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+
         //Get Library Name
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
+        libraryId = intent.getIntExtra("libraryId", 1);
         TextView titleText = (TextView) findViewById(R.id.libraryName);
         titleText.setText(name);
 
         //Define Favorite library button => Temporary as a Text variable / store in server in future
         final Button[] favoriteButton = {(Button) findViewById(R.id.favoriteButton)};
         final boolean[] isFavorite = {intent.getBooleanExtra("favorite", false)};
-        if(isFavorite[0]) {
+        if (isFavorite[0]) {
             favoriteButton[0].setText("★");
         } else {
             favoriteButton[0].setText("✩");
         }
         favoriteButton[0].setOnClickListener(view -> {
-            if(isFavorite[0]) {
+            if (isFavorite[0]) {
                 favoriteButton[0].setText("✩");
             } else {
                 favoriteButton[0].setText("★");
@@ -50,36 +67,45 @@ public class LibraryInfo extends AppCompatActivity {
             isFavorite[0] = !isFavorite[0];
         });
 
-        //Temporary list => Will be send by server in the future
-        List<Book> bookList = new ArrayList<>();
-        Book book1 = new Book(0, "Les Miserables", "Victor Hugo", "french", R.drawable.les_miserables_cover);
-        Book book2 = new Book(1, "Les Fables de La Fontaine", "De La Fontaine", "french", R.drawable.fables_cover);
-        bookList.add(book1);
-        bookList.add(book2);
-        List<String> titles =  bookList.stream().map(Book::getTitle).collect(Collectors.toList());
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(LibraryInfo.this, android.R.layout.simple_list_item_1, titles);
+        fetchBooks(libraryId, new BooksCallback() {
+            @Override
+            public void onBooksFetched(List<Book> books) {
+                // Handle the fetched books
+                List<Book> bookList = new ArrayList<>();
+                bookList.addAll(books);
 
-        //Define the list of library's books
-        ListView listBooks = findViewById(R.id.listBooks);
-        listBooks.setAdapter(adapter);
-        listBooks.setOnItemClickListener((adapterView, view, position, id) -> {
-            Book book = bookList.get(position);
+                // Render the view with the bookList
+                List<String> titles = bookList.stream().map(Book::getTitle).collect(Collectors.toList());
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(LibraryInfo.this, android.R.layout.simple_list_item_1, titles);
 
-            Intent intent1 = new Intent(LibraryInfo.this, BookInfo.class);
-            intent1.putExtra("id", book.getId());
-            intent1.putExtra("title", book.getTitle());
-            intent1.putExtra("author", book.getAuthor());
-            intent1.putExtra("language", book.getLanguage());
-            intent1.putExtra("image", book.getImage());
-            startActivity(intent1);
+                //Define the list of library's books
+                ListView listBooks = findViewById(R.id.listBooks);
+                listBooks.setAdapter(adapter);
+                listBooks.setOnItemClickListener((adapterView, view, position, id) -> {
+                    Book book = bookList.get(position);
+                    Intent intent1 = new Intent(LibraryInfo.this, BookInfo.class);
+                    intent1.putExtra("id", book.getId());
+                    intent1.putExtra("title", book.getTitle());
+                    intent1.putExtra("author", book.getAuthor());
+                    intent1.putExtra("language", book.getLanguage());
+                    intent1.putExtra("image", book.getImage());
+                    startActivity(intent1);
+                });
+            }
+
+            @Override
+            public void onFetchFailed() {
+                // Handle the fetch failure
+                Log.e("FETCHBOOKS", "Failed to fetch books");
+            }
         });
 
-        //Define new Book button => Will change to a scan parameter if book is unknown
+        //Define check-in button
         Button checkInButton = (Button) findViewById(R.id.inButton);
         checkInButton.setOnClickListener(view -> {
-            Intent intent12 = new Intent(LibraryInfo.this, newBook.class);
-            intent12.putExtra("library", name);
-            startActivity(intent12);
+            Intent intentCheckIn = new Intent(LibraryInfo.this, CheckIn.class);
+            intentCheckIn.putExtra("library", name);
+            startActivity(intentCheckIn);
         });
 
         //Define Google Map itinerary Button
@@ -108,6 +134,25 @@ public class LibraryInfo extends AppCompatActivity {
         searchButton.setOnClickListener(view -> {
             Intent intent14 = new Intent(LibraryInfo.this, SearchActivity.class);
             startActivity(intent14);
+        });
+    }
+
+    private void fetchBooks(int libraryId, final BooksCallback callback) {
+        apiService.getBooksByLibraryId(libraryId).enqueue(new Callback<List<Book>>() {
+            @Override
+            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+                if (response.isSuccessful()) {
+                    List<Book> books = response.body();
+                    callback.onBooksFetched(books);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Book>> call, Throwable t) {
+                // Handle error here
+                t.printStackTrace();
+                callback.onFetchFailed();
+            }
         });
     }
 }
