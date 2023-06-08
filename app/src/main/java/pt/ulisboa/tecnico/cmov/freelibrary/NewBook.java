@@ -30,7 +30,7 @@ public class NewBook extends AppCompatActivity {
         Intent intent = getIntent();
 
         String libraryName = intent.getStringExtra("library");
-        TextView libraryText = findViewById(R.id.codeBarSend);
+        TextView libraryText = findViewById(R.id.libraryBook2);
         libraryText.setText(libraryName);
 
         String codeBarTxt = intent.getStringExtra("code");

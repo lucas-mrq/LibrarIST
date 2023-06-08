@@ -1,80 +1,29 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.gms.tasks.Task;
-import com.google.mlkit.vision.barcode.Barcode;
-import com.google.mlkit.vision.barcode.BarcodeScanner;
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
-import com.google.mlkit.vision.barcode.BarcodeScanning;
-import com.google.mlkit.vision.common.InputImage;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.SparseArray;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
-import java.util.List;
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
+
+import java.io.IOException;
 
 public class CheckIn extends AppCompatActivity {
-
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private ActivityResultLauncher<Intent> imageScan;
-    private String handleImagePickerResult(Intent data) {
-        if (data != null) {
-            Uri imageUri = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                return getPictureCode(bitmap);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "Write it";
-            }
-        } else {
-            return "Write it";
-        }
-    }
-
-    private String getPictureCode(Bitmap imageCode) {
-        InputImage image = InputImage.fromBitmap(imageCode, 0);
-        BarcodeScannerOptions options =
-                new BarcodeScannerOptions.Builder()
-                        .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
-                        .build();
-        BarcodeScanner scanner = BarcodeScanning.getClient(options);
-
-        Task<List<Barcode>> result = scanner.process(image)
-                .addOnSuccessListener(barcodes -> {
-                    if (barcodes.size() > 0) {
-                        Barcode barcode = barcodes.get(0);
-                        String codeResult = barcode.getRawValue();
-                        EditText scanText = findViewById(R.id.codeBar);
-                        scanText.setText(codeResult);
-                    } else {
-                        EditText scanText = findViewById(R.id.codeBar);
-                        scanText.setText("No barcode found");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    e.printStackTrace();
-                    EditText scanText = findViewById(R.id.codeBar);
-                    scanText.setText("Failed to detect barcode");
-                });
-
-        EditText scanText = findViewById(R.id.codeBar);
-        return String.valueOf(scanText.getText());
-    }
+    private CameraSource cameraSource;
+    private static final int REQUEST_CAMERA_PERMISSION = 201;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,43 +35,6 @@ public class CheckIn extends AppCompatActivity {
         String libraryName = intent.getStringExtra("library");
         TextView libraryText = findViewById(R.id.libraryBookName);
         libraryText.setText(libraryName);
-
-        imageScan = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        handleImagePickerResult(result.getData());
-                        //Define the Select Photo button
-                        EditText scanText = findViewById(R.id.codeBar);
-                        scanText.setText(handleImagePickerResult(result.getData()));
-                    }
-                });
-
-        Button fileScanButton = findViewById(R.id.fileButton);
-        fileScanButton.setOnClickListener(view -> {
-            Intent intentFilePhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intentFilePhoto.setType("image/*");
-
-            if (intentFilePhoto.resolveActivity(getPackageManager()) != null) {
-                imageScan.launch(intentFilePhoto);
-            } else {
-                EditText scanText = findViewById(R.id.codeBar);
-                scanText.setText("Write it");
-            }
-        });
-
-        Button cameraScanButton = findViewById(R.id.cameraButton);
-        cameraScanButton.setOnClickListener(view -> {
-            // Demander la permission CAMERA
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-            } else {
-                Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                if (intentCamera.resolveActivity(getPackageManager()) != null) {
-                    imageScan.launch(intentCamera);
-                }
-            }
-        });
 
         //Define Map & Search Buttons
         Button checkInButton = findViewById(R.id.checkInRegisterButton);
@@ -146,23 +58,92 @@ public class CheckIn extends AppCompatActivity {
             Intent intentSearch = new Intent(CheckIn.this, SearchActivity.class);
             startActivity(intentSearch);
         });
+
+        initialiseDetectorsAndSources();
+    }
+
+    private void initialiseDetectorsAndSources() {
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
+                .setBarcodeFormats(Barcode.ALL_FORMATS)
+                .build();
+
+        cameraSource = new CameraSource.Builder(this, barcodeDetector)
+                .setRequestedPreviewSize(640, 480)
+                .setAutoFocusEnabled(true)
+                .build();
+
+        SurfaceView surfaceView = findViewById(R.id.surface_view);
+        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                try {
+                    if (ActivityCompat.checkSelfPermission(CheckIn.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        cameraSource.start(surfaceView.getHolder());
+                    } else {
+                        ActivityCompat.requestPermissions(CheckIn.this, new
+                                String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                cameraSource.stop();
+            }
+        });
+
+        barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+            @Override
+            public void release() {
+            }
+
+            EditText barcodeText = findViewById(R.id.codeBar);
+            @Override
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
+                final SparseArray<Barcode> barcodes = detections.getDetectedItems();
+                if (barcodes.size() != 0) {
+                    barcodeText.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            String barcodeData;
+                            if (barcodes.valueAt(0).email != null) {
+                                barcodeText.removeCallbacks(null);
+                                barcodeData = barcodes.valueAt(0).email.address;
+                                barcodeText.setText(barcodeData);
+                            } else {
+                                barcodeData = barcodes.valueAt(0).displayValue;
+                                barcodeText.setText(barcodeData);
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Open Camera
-                Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (intentCamera.resolveActivity(getPackageManager()) != null) {
-                    imageScan.launch(intentCamera);
-                }
-            } else {
-                // Cannot open
-                EditText scanText = findViewById(R.id.codeBar);
-                scanText.setText("Write it");
-            }
+    protected void onPause() {
+        super.onPause();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
         }
+        if (cameraSource != null) {
+            cameraSource.release();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+        initialiseDetectorsAndSources();
     }
 }
