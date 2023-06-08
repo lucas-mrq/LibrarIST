@@ -1,9 +1,10 @@
-package pt.ulisboa.tecnico.cmov.freelibrary;
+package pt.ulisboa.tecnico.cmov.freelibrary.models;
 
 public class Book {
-    private int id;
-    private String title;
-    private String author;
+    public int id;
+    public String title;
+    public String author;
+    public String isbn;
 
     public Book(int id, String title, String author) {
         this.id = id;
@@ -26,6 +27,4 @@ public class Book {
     public String getAuthor() {
         return author;
     }
-
 }
-
