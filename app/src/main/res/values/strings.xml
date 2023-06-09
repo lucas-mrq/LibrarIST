@@ -2,4 +2,6 @@
     <string name="app_name">FreeLibrary</string>
     <string name="search">Search</string>
     <string name="map">Map</string>
+    <string name="permission_required_toast">Permission required toast.</string>
+
 </resources>
