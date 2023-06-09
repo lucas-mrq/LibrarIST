@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
-import pt.ulisboa.tecnico.cmov.freelibrary.api.BookCallback;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.BooksCallback;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
@@ -41,27 +39,26 @@ public class LibraryInfo extends AppCompatActivity {
         //Get Library Name
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
-        libraryId = intent.getIntExtra("libraryId",1 );
+        libraryId = intent.getIntExtra("libraryId", 1);
         TextView titleText = (TextView) findViewById(R.id.libraryName);
         titleText.setText(name);
 
         //Define Favorite library button => Temporary as a Text variable / store in server in future
         final Button[] favoriteButton = {(Button) findViewById(R.id.favoriteButton)};
         final boolean[] isFavorite = {intent.getBooleanExtra("favorite", false)};
-        if(isFavorite[0]) {
+        if (isFavorite[0]) {
             favoriteButton[0].setText("★");
         } else {
             favoriteButton[0].setText("✩");
         }
         favoriteButton[0].setOnClickListener(view -> {
-            if(isFavorite[0]) {
+            if (isFavorite[0]) {
                 favoriteButton[0].setText("✩");
             } else {
                 favoriteButton[0].setText("★");
             }
             isFavorite[0] = !isFavorite[0];
         });
-
 
         fetchBooks(libraryId, new BooksCallback() {
             @Override
@@ -71,18 +68,21 @@ public class LibraryInfo extends AppCompatActivity {
                 bookList.addAll(books);
 
                 // Render the view with the bookList
-                List<String> titles =  bookList.stream().map(Book::getTitle).collect(Collectors.toList());
+                List<String> titles = bookList.stream().map(Book::getTitle).collect(Collectors.toList());
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(LibraryInfo.this, android.R.layout.simple_list_item_1, titles);
 
+                //Define the list of library's books
                 ListView listBooks = findViewById(R.id.listBooks);
                 listBooks.setAdapter(adapter);
                 listBooks.setOnItemClickListener((adapterView, view, position, id) -> {
-                    Book selectedBook = bookList.get(position);
-                    Intent intent = new Intent(LibraryInfo.this, BookInfo.class);
-                    intent.putExtra("id", selectedBook.getId());
-                    intent.putExtra("title", selectedBook.getTitle());
-                    intent.putExtra("author", selectedBook.getAuthor());
-                    startActivity(intent);
+                    Book book = bookList.get(position);
+                    Intent intent1 = new Intent(LibraryInfo.this, BookInfo.class);
+                    intent1.putExtra("id", book.getId());
+                    intent1.putExtra("title", book.getTitle());
+                    intent1.putExtra("author", book.getAuthor());
+                    intent1.putExtra("language", book.getLanguage());
+                    intent1.putExtra("image", book.getImage());
+                    startActivity(intent1);
                 });
             }
 
@@ -148,5 +148,4 @@ public class LibraryInfo extends AppCompatActivity {
             }
         });
     }
-
 }

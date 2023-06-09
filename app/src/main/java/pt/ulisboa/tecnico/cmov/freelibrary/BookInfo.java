@@ -2,12 +2,17 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class BookInfo extends AppCompatActivity {
+
+    private boolean activeNotifications = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,11 +23,18 @@ public class BookInfo extends AppCompatActivity {
         Intent intent = getIntent();
         String title = intent.getStringExtra("title");
         String author = intent.getStringExtra("author");
+        String language = intent.getStringExtra("language");
+        int image = intent.getIntExtra("image", R.drawable.fables_cover);
 
         TextView titleText = (TextView) findViewById(R.id.bookTitle);
         TextView authorText = (TextView) findViewById(R.id.bookAuthor);
+        TextView languageText = (TextView) findViewById(R.id.bookLanguage);
+        ImageView coverImage = (ImageView) findViewById((R.id.cover));
+
         titleText.setText(title);
         authorText.setText(author);
+        languageText.setText(language);
+        coverImage.setImageResource(image);
 
         //Define Map & Search Buttons
         Button mapButton = (Button) findViewById(R.id.mapMenuBook);
@@ -36,5 +48,23 @@ public class BookInfo extends AppCompatActivity {
             Intent intent12 = new Intent(BookInfo.this, SearchActivity.class);
             startActivity(intent12);
         });
+
+        ImageView notificationIcon = findViewById(R.id.notifications);
+        notificationIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (activeNotifications) {
+                    notificationIcon.setImageResource(R.drawable.notifications_off);
+                    activeNotifications = false;
+                }
+                else {
+                    notificationIcon.setImageResource(R.drawable.notifications_active);
+                    activeNotifications = true;
+                }
+
+            }
+        });
     }
+
+
 }

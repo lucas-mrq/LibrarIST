@@ -6,11 +6,19 @@ public class Book {
     public String author;
     public String isbn;
 
-    public Book(int id, String title, String author) {
+    private String language;
+
+    private int coverId;
+
+    public Book(int id, String title, String author, String language, int coverId) {
         this.id = id;
         this.title = title;
         this.author = author;
+        this.language = language;
+        this.coverId = coverId;
     }
+
+    public int getImage() { return coverId;}
 
     public int getId() {
         return id;
@@ -22,6 +30,10 @@ public class Book {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getLanguage() {
+        return language;
     }
 
     public String getAuthor() {
