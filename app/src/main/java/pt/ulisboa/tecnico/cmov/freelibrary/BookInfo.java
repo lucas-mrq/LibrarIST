@@ -30,6 +30,13 @@ public class BookInfo extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if (ThemeManager.isDarkThemeEnabled()) {
+            setTheme(R.style.AppThemeLight);
+        } else {
+            setTheme(R.style.AppThemeDark);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_info);
 
@@ -81,23 +88,6 @@ public class BookInfo extends AppCompatActivity {
                 // handle failure scenario here
             }
         });
-
-
-
-
-        //Define Map & Search Buttons
-        Button mapButton = (Button) findViewById(R.id.mapMenuBook);
-        mapButton.setOnClickListener(view -> {
-            Intent intent1 = new Intent(BookInfo.this, MainActivity.class);
-            startActivity(intent1);
-        });
-
-        Button searchButton = (Button) findViewById(R.id.searchMenuBook);
-        searchButton.setOnClickListener(view -> {
-            Intent intent12 = new Intent(BookInfo.this, SearchActivity.class);
-            startActivity(intent12);
-        });
-
         ImageView notificationIcon = findViewById(R.id.notifications);
         notificationIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +103,23 @@ public class BookInfo extends AppCompatActivity {
 
             }
         });
+
+        //Define Theme Button
+        Button themeButton = findViewById(R.id.themeButton);
+        ThemeManager.setThemeButton(themeButton);
+
+        //Define Map Buttons
+        Button mapButton = (Button) findViewById(R.id.mapMenu);
+        mapButton.setOnClickListener(view -> {
+            Intent intentMap = new Intent(BookInfo.this, MainActivity.class);
+            startActivity(intentMap);
+        });
+
+        //Define Search Buttons
+        Button searchButton = (Button) findViewById(R.id.searchMenu);
+        searchButton.setOnClickListener(view -> {
+            Intent intentSearch = new Intent(BookInfo.this, SearchActivity.class);
+            startActivity(intentSearch);
+        });
     }
-
-
 }

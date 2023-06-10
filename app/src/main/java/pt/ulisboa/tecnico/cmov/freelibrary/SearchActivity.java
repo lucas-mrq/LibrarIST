@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -19,6 +20,13 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if (ThemeManager.isDarkThemeEnabled()) {
+            setTheme(R.style.AppThemeLight);
+        } else {
+            setTheme(R.style.AppThemeDark);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
@@ -91,12 +99,22 @@ public class SearchActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        //Define Theme Button
+        Button themeButton = findViewById(R.id.themeButton);
+        ThemeManager.setThemeButton(themeButton);
+
         //Define Map Buttons
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
-            Intent intent = new Intent(SearchActivity.this, MainActivity.class);
-            startActivity(intent);
+            Intent intentMap = new Intent(SearchActivity.this, MainActivity.class);
+            startActivity(intentMap);
         });
 
+        //Define Search Buttons
+        Button searchButton = (Button) findViewById(R.id.searchMenu);
+        searchButton.setOnClickListener(view -> {
+            Intent intentSearch = new Intent(SearchActivity.this, SearchActivity.class);
+            startActivity(intentSearch);
+        });
     }
 }

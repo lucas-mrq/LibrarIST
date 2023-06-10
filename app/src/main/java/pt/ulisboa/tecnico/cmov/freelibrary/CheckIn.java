@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -27,6 +28,13 @@ public class CheckIn extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if (ThemeManager.isDarkThemeEnabled()) {
+            setTheme(R.style.AppThemeLight);
+        } else {
+            setTheme(R.style.AppThemeDark);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_in);
 
@@ -46,20 +54,25 @@ public class CheckIn extends AppCompatActivity {
             startActivity(intent12);
         });
 
-        //Define Map & Search Buttons
-        Button mapButton = findViewById(R.id.mapMenuCheckIn);
+        initialiseDetectorsAndSources();
+
+        //Define Theme Button
+        Button themeButton = findViewById(R.id.themeButton);
+        ThemeManager.setThemeButton(themeButton);
+
+        //Define Map Buttons
+        Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
-            Intent intentMain = new Intent(CheckIn.this, MainActivity.class);
-            startActivity(intentMain);
+            Intent intentMap = new Intent(CheckIn.this, MainActivity.class);
+            startActivity(intentMap);
         });
 
-        Button searchButton = findViewById(R.id.searchMenuCheckIn);
+        //Define Search Buttons
+        Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(CheckIn.this, SearchActivity.class);
             startActivity(intentSearch);
         });
-
-        initialiseDetectorsAndSources();
     }
 
     private void initialiseDetectorsAndSources() {
