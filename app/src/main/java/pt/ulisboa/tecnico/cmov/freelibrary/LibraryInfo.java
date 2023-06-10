@@ -1,22 +1,27 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+
 import android.location.Address;
 import android.location.Geocoder;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
+
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,24 +29,19 @@ import java.util.stream.Collectors;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.BooksCallback;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
-import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import android.os.Bundle;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.MapStyleOptions;
 
 public class LibraryInfo extends AppCompatActivity
     implements OnMapReadyCallback {
@@ -140,21 +140,6 @@ public class LibraryInfo extends AppCompatActivity
             startActivity(intentCheckIn);
         });
 
-        //Define Google Map itinerary Button
-        String address = intent.getStringExtra("address");
-        Button itineraryButton = (Button) findViewById(R.id.itineraryButton);
-        itineraryButton.setText("Go to: " + address);
-        itineraryButton.setOnClickListener(view -> {
-            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
-            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-            mapIntent.setPackage("com.google.android.apps.maps");
-            if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(mapIntent);
-            } else {
-                itineraryButton.setText("Install Google Map");
-            }
-        });
-
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
@@ -197,6 +182,13 @@ public class LibraryInfo extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
         enableMyLocation();
+
+        if (ThemeManager.isDarkThemeEnabled()) {
+            mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.darkmap));
+        } else {
+            mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.lightmap));
+        }
+
         zoomToAddress(address);
     }
 
