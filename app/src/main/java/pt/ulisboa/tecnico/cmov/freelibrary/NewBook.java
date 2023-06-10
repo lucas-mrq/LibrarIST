@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,10 +45,19 @@ public class NewBook extends AppCompatActivity {
                 if (data != null) {
                     Uri uri = data.getData();
                     ImageView bookImage = findViewById(R.id.bookImage);
-                    bookImage.setImageURI(uri);
+                    if (uri == null) {
+                        Bundle extras = data.getExtras();
+                        if (extras != null) {
+                            Bitmap imageBitmap = (Bitmap) extras.get("data");
+                            bookImage.setImageBitmap(imageBitmap);
+                        }
+                    } else {
+                        bookImage.setImageURI(uri);
+                    }
                 }
             }
         });
+
 
         Button fileBookButton = findViewById(R.id.filePhoto);
         fileBookButton.setOnClickListener(view -> {
