@@ -50,6 +50,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.MapStyleOptions;
 
 import java.util.List;
 
@@ -145,10 +146,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mGoogleMap = googleMap;
+
+        if (ThemeManager.isDarkThemeEnabled()) {
+            mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.darkmap));
+        } else {
+            mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.lightmap));
+        }
+
         mGoogleMap.setOnMarkerClickListener(this);
         fetchLibraries();
         enableMyLocation();
     }
+
 
     private void fetchLibraries() {
         apiService.getAllLibraries().enqueue(new Callback<List<Library>>() {
