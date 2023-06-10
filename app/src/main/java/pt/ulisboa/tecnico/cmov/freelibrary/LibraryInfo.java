@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.BooksCallback;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
 
 import retrofit2.Call;
@@ -42,6 +43,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class LibraryInfo extends AppCompatActivity
     implements OnMapReadyCallback {
@@ -178,6 +180,36 @@ public class LibraryInfo extends AppCompatActivity
         });
     }
 
+    private void fetchLibraries() {
+        apiService.getAllLibraries().enqueue(new Callback<List<Library>>() {
+            @Override
+            public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
+                if (response.isSuccessful()) {
+                    List<Library> libraries = response.body();
+                    LatLng libraryLocation;
+                    for (Library library : libraries) {
+                        if (library.id == libraryId) {
+                            libraryLocation = new LatLng(library.latitude, library.longitude);
+                            mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            builder.include(libraryLocation);
+                            LatLngBounds bounds = builder.build();
+                            int padding = 100; // Adjust the padding as needed
+                            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+                            return;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Library>> call, Throwable t) {
+                // Handle error here
+                t.printStackTrace();
+            }
+        });
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
@@ -189,7 +221,7 @@ public class LibraryInfo extends AppCompatActivity
             mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.lightmap));
         }
 
-        zoomToAddress(address);
+        fetchLibraries();
     }
 
     private void zoomToAddress(String address) {
