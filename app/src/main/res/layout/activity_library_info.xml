@@ -101,19 +101,19 @@
         android:layout_width="190dp"
         android:layout_height="114dp"
         android:layout_marginTop="15dp"
-        app:layout_constraintStart_toStartOf="@+id/imageView6"
-        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+        app:layout_constraintStart_toStartOf="@+id/map"
+        app:layout_constraintTop_toBottomOf="@+id/map"
         app:srcCompat="@drawable/free_library_example" />
 
-    <ImageView
-        android:id="@+id/imageView6"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="342dp"
         android:layout_height="209dp"
         android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/library_location"
-        app:srcCompat="@drawable/fake_map" />
+        app:layout_constraintTop_toBottomOf="@+id/library_location" />
 
     <TextView
         android:id="@+id/library_location"

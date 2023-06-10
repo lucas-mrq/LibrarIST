@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,15 +20,32 @@ import java.util.stream.Collectors;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.BooksCallback;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import android.os.Bundle;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-public class LibraryInfo extends AppCompatActivity {
+public class LibraryInfo extends AppCompatActivity
+    implements OnMapReadyCallback {
 
     private ApiService apiService;
+    private GoogleMap mGoogleMap;
     private int libraryId;
+
+    private String address = "48 av de la Republica, Lisboa";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +78,12 @@ public class LibraryInfo extends AppCompatActivity {
             }
             isFavorite[0] = !isFavorite[0];
         });
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+
+        //Initialize the map fragment
+        mapFragment.getMapAsync(this);
 
         fetchBooks(libraryId, new BooksCallback() {
             @Override
@@ -148,4 +173,40 @@ public class LibraryInfo extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
+        zoomToAddress(address);
+    }
+
+    private void zoomToAddress(String address) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        LatLng libraryLocation = getLocationFromAddress(address);
+
+        if (libraryLocation != null) {
+            builder.include(libraryLocation);
+            LatLngBounds bounds = builder.build();
+            int padding = 100;
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+        } else {
+            Toast.makeText(this, "Error address", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private LatLng getLocationFromAddress(String strAddress) {
+        Geocoder geocoder = new Geocoder(this);
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(strAddress, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                return new LatLng(address.getLatitude(), address.getLongitude());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
