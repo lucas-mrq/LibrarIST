@@ -4,13 +4,27 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
+import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class BookInfo extends AppCompatActivity {
+
+    private ApiService apiService;
 
     private boolean activeNotifications = false;
 
@@ -26,8 +40,11 @@ public class BookInfo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_info);
 
+        apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+
         //Get & set book information's
         Intent intent = getIntent();
+        int bookId = intent.getIntExtra("id", 0);
         String title = intent.getStringExtra("title");
         String author = intent.getStringExtra("author");
         String language = intent.getStringExtra("language");
@@ -43,6 +60,34 @@ public class BookInfo extends AppCompatActivity {
         languageText.setText(language);
         coverImage.setImageResource(image);
 
+        // Define available libraries
+        ListView availabilityListView = findViewById(R.id.listofLibraryWhereBookAvailable);
+        List<String> availabilityList = new ArrayList<>();
+
+        // Fetch the libraries
+        Call<List<Library>> call = apiService.getAvailableBooksInLibrary(bookId);
+        call.enqueue(new Callback<List<Library>>() {
+            @Override
+            public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
+                if(response.isSuccessful() && response.body() != null) {
+                    List<Library> libraries = response.body();
+                    Log.i("BOOKINFO", libraries.toString());
+                    for (Library library : libraries) {
+                        Log.i("BOOKINFO", library.getName());
+                        availabilityList.add(library.getName());
+                    }
+                    ArrayAdapter<String> availabilityAdapter = new ArrayAdapter<>(BookInfo.this, android.R.layout.simple_list_item_1, availabilityList);
+                    availabilityListView.setAdapter(availabilityAdapter);
+                } else {
+                    // handle the case where response is not successful or body is null
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Library>> call, Throwable t) {
+                // handle failure scenario here
+            }
+        });
         ImageView notificationIcon = findViewById(R.id.notifications);
         notificationIcon.setOnClickListener(new View.OnClickListener() {
             @Override
