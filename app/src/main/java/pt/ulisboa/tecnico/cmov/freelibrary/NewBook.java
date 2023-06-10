@@ -29,9 +29,9 @@ public class NewBook extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         if (ThemeManager.isDarkThemeEnabled()) {
-            setTheme(R.style.AppThemeLight);
-        } else {
             setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppThemeLight);
         }
 
         super.onCreate(savedInstanceState);

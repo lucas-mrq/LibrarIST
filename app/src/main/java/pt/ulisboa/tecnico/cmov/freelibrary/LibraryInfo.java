@@ -16,8 +16,10 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+import android.net.Uri;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
@@ -43,16 +45,24 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+
 
 public class LibraryInfo extends AppCompatActivity
-    implements OnMapReadyCallback {
+    implements
+        OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener {
 
     private ApiService apiService;
     private GoogleMap mGoogleMap;
     private int libraryId;
 
-    private String address = "48 av de la Republica, Lisboa";
+    LatLngBounds bounds;
+
+    LatLng libraryLocation;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
@@ -60,9 +70,9 @@ public class LibraryInfo extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         if (ThemeManager.isDarkThemeEnabled()) {
-            setTheme(R.style.AppThemeLight);
-        } else {
             setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppThemeLight);
         }
 
         super.onCreate(savedInstanceState);
@@ -134,6 +144,17 @@ public class LibraryInfo extends AppCompatActivity
             }
         });
 
+        Button routeButton = findViewById(R.id.routeButton);
+        routeButton.setOnClickListener(view -> {
+            startGoogleMap();
+        });
+
+        Button centerButton = findViewById(R.id.centerButton);
+        centerButton.setOnClickListener(view -> {
+            int padding = 100;
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+        });
+
         //Define check-in button
         Button checkInButton = (Button) findViewById(R.id.inButton);
         checkInButton.setOnClickListener(view -> {
@@ -161,6 +182,40 @@ public class LibraryInfo extends AppCompatActivity
         });
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        startGoogleMap();
+        return true;
+    }
+
+    public void startGoogleMap() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null) {
+                    LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    if (libraryLocation != null) {
+                        Intent intentItinerary = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("http://maps.google.com/maps?saddr=" +
+                                        currentLocation.latitude + "," + currentLocation.longitude +
+                                        "&daddr=" + libraryLocation.latitude + "," + libraryLocation.longitude));
+                        startActivity(intentItinerary);
+                    } else {
+                        Toast.makeText(this, "Unable to find library", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Unable to find position", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
     private void fetchBooks(int libraryId, final BooksCallback callback) {
         apiService.getBooksByLibraryId(libraryId).enqueue(new Callback<List<Book>>() {
             @Override
@@ -186,14 +241,13 @@ public class LibraryInfo extends AppCompatActivity
             public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
                 if (response.isSuccessful()) {
                     List<Library> libraries = response.body();
-                    LatLng libraryLocation;
                     for (Library library : libraries) {
                         if (library.id == libraryId) {
                             libraryLocation = new LatLng(library.latitude, library.longitude);
                             mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
                             LatLngBounds.Builder builder = new LatLngBounds.Builder();
                             builder.include(libraryLocation);
-                            LatLngBounds bounds = builder.build();
+                            bounds = builder.build();
                             int padding = 100; // Adjust the padding as needed
                             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
                             return;
@@ -221,23 +275,10 @@ public class LibraryInfo extends AppCompatActivity
             mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.lightmap));
         }
 
+        mGoogleMap.setOnMarkerClickListener(this);
+
         fetchLibraries();
     }
-
-    private void zoomToAddress(String address) {
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        LatLng libraryLocation = getLocationFromAddress(address);
-
-        if (libraryLocation != null) {
-            builder.include(libraryLocation);
-            LatLngBounds bounds = builder.build();
-            int padding = 100;
-            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
-        } else {
-            Toast.makeText(this, "Error address", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
