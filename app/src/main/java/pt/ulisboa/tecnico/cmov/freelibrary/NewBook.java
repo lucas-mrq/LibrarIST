@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,6 +26,13 @@ public class NewBook extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if (ThemeManager.isDarkThemeEnabled()) {
+            setTheme(R.style.AppThemeLight);
+        } else {
+            setTheme(R.style.AppThemeDark);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_book);
 
@@ -83,14 +91,19 @@ public class NewBook extends AppCompatActivity {
             }
         });
 
-        //Define Map & Search Buttons
-        Button mapButton = findViewById(R.id.mapMenuNewBook);
+        //Define Theme Button
+        Button themeButton = findViewById(R.id.themeButton);
+        ThemeManager.setThemeButton(themeButton);
+
+        //Define Map Buttons
+        Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
-            Intent intentMain = new Intent(NewBook.this, MainActivity.class);
-            startActivity(intentMain);
+            Intent intentMap = new Intent(NewBook.this, MainActivity.class);
+            startActivity(intentMap);
         });
 
-        Button searchButton = findViewById(R.id.searchMenuNewBook);
+        //Define Search Buttons
+        Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(NewBook.this, SearchActivity.class);
             startActivity(intentSearch);

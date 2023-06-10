@@ -32,6 +32,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,6 +50,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.MapStyleOptions;
 
 import java.util.List;
 
@@ -93,6 +96,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if (ThemeManager.isDarkThemeEnabled()) {
+            setTheme(R.style.AppThemeLight);
+        } else {
+            setTheme(R.style.AppThemeDark);
+        }
+
         super.onCreate(savedInstanceState);
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -100,24 +110,27 @@ public class MainActivity extends AppCompatActivity
         //Instantiate ApiService
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
-
-        //Temporary Button that lead to a virtual library
-        Button testButton = findViewById(R.id.testLibrary);
-        testButton.setOnClickListener(view -> {
-            onLibraryClick(false, "Library Test", "48 Av de la Republic Lisbon, Portugal", 1);
-        });
-
-
         //Define the Map in background
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
+        //Define Theme Button
+        Button themeButton = findViewById(R.id.themeButton);
+        ThemeManager.setThemeButton(themeButton);
+
+        //Define Map Buttons
+        Button mapButton = (Button) findViewById(R.id.mapMenu);
+        mapButton.setOnClickListener(view -> {
+            Intent intentMap = new Intent(MainActivity.this, MainActivity.class);
+            startActivity(intentMap);
+        });
+
         //Define Search Buttons
-        Button searchButton = findViewById(R.id.searchMenu);
+        Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-            startActivity(intent);
+            Intent intentSearch = new Intent(MainActivity.this, SearchActivity.class);
+            startActivity(intentSearch);
         });
     }
 
@@ -133,10 +146,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mGoogleMap = googleMap;
+
+        if (ThemeManager.isDarkThemeEnabled()) {
+            mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.darkmap));
+        } else {
+            mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.lightmap));
+        }
+
         mGoogleMap.setOnMarkerClickListener(this);
         fetchLibraries();
         enableMyLocation();
     }
+
 
     private void fetchLibraries() {
         apiService.getAllLibraries().enqueue(new Callback<List<Library>>() {
