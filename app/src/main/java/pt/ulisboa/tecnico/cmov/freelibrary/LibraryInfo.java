@@ -1,6 +1,9 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -28,6 +31,7 @@ import retrofit2.Response;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -46,6 +50,8 @@ public class LibraryInfo extends AppCompatActivity
     private int libraryId;
 
     private String address = "48 av de la Republica, Lisboa";
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +183,7 @@ public class LibraryInfo extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+        enableMyLocation();
         zoomToAddress(address);
     }
 
@@ -192,6 +199,18 @@ public class LibraryInfo extends AppCompatActivity
         } else {
             Toast.makeText(this, "Error address", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mGoogleMap.setMyLocationEnabled(true);
+            return;
+        }
+        PermissionUtils.requestLocationPermissions(this, LOCATION_PERMISSION_REQUEST_CODE, true);
     }
 
 
