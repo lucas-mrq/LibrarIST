@@ -251,7 +251,7 @@ public class LibraryInfo extends AppCompatActivity
 
             @Override
             public void onFailure(Call<List<Library>> call, Throwable t) {
-                // Handle error here&
+                // Handle error here
                 t.printStackTrace();
             }
         });
