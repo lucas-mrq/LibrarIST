@@ -15,25 +15,13 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 // limitations under the License.
 
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.DKGRAY;
-import static android.graphics.Color.GRAY;
-import static android.graphics.Color.LTGRAY;
 
 import android.Manifest.permission;
-import android.annotation.SuppressLint;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-
 import android.Manifest;
+
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -41,20 +29,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.Bundle;
+
+import android.annotation.SuppressLint;
 import android.widget.Button;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -68,6 +55,7 @@ import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -110,9 +98,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         if (ThemeManager.isDarkThemeEnabled()) {
-            setTheme(R.style.AppThemeLight);
-        } else {
             setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppThemeLight);
         }
 
         super.onCreate(savedInstanceState);
