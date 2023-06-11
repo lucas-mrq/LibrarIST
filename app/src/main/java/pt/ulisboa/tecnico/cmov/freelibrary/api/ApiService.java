@@ -28,4 +28,7 @@ public interface ApiService {
 
     @GET("/api/libraries")
     Call<List<Library>> getAllLibraries();
+
+    @POST("/api/libraries/{libraryId}/books/{bookId}/checkin")
+    Call<Void> checkInBook(@Path("libraryId") int libraryId, @Path("bookId") int bookId);
 }

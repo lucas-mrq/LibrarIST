@@ -10,9 +10,11 @@ import android.provider.MediaStore;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -20,10 +22,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class NewBook extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private ActivityResultLauncher<Intent> imageBook;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +46,9 @@ public class NewBook extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_book);
 
+        //Instantiate ApiService
+        apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+
         //Define Library Name
         Intent intent = getIntent();
 
@@ -44,7 +56,9 @@ public class NewBook extends AppCompatActivity {
         TextView libraryText = findViewById(R.id.libraryBook2);
         libraryText.setText(libraryName);
 
-        String codeBarTxt = intent.getStringExtra("code");
+        //String codeBarTxt = intent.getStringExtra("code");
+        /* TODO: don't hardcode the bookId */
+        String codeBarTxt = "3";
         TextView codeBar = findViewById(R.id.codeBarSend);
         codeBar.setText(codeBarTxt);
 
@@ -91,6 +105,40 @@ public class NewBook extends AppCompatActivity {
                 }
             }
         });
+
+        Button registerButton = findViewById(R.id.registerButton);
+        registerButton.setOnClickListener(view -> {
+            String bookId = codeBarTxt; // Assuming codeBarTxt holds the book ID
+
+            int libraryId = getIntent().getIntExtra("libraryId", 0); // Replace "libraryId" with the actual key used to pass the library ID
+
+            // Call the check-in API
+            Call<Void> checkInCall = apiService.checkInBook(libraryId, Integer.parseInt(bookId));
+            checkInCall.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(getApplicationContext(), "Book checked in successfully", Toast.LENGTH_SHORT).show();
+
+                        // Start the LibraryInfo activity
+                        Intent intentLibraryInfo = new Intent(NewBook.this, LibraryInfo.class);
+                        intentLibraryInfo.putExtra("libraryId", libraryId);
+                        startActivity(intentLibraryInfo);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Book checked in failed", Toast.LENGTH_SHORT).show();
+                        // Handle the error response
+                        // You can check the response code and display an appropriate error message
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.i("REGISTERTAG", "failure");
+                    // Handle the failure (e.g., network error)
+                }
+            });
+        });
+
 
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
