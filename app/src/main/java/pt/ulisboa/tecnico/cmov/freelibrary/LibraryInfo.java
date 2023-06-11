@@ -43,7 +43,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -59,8 +58,7 @@ public class LibraryInfo extends AppCompatActivity
     private ApiService apiService;
     private GoogleMap mGoogleMap;
     private int libraryId;
-
-    LatLngBounds bounds;
+    private int zoomMap = 15;
 
     LatLng libraryLocation;
 
@@ -151,8 +149,7 @@ public class LibraryInfo extends AppCompatActivity
 
         Button centerButton = findViewById(R.id.centerButton);
         centerButton.setOnClickListener(view -> {
-            int padding = 100;
-            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(libraryLocation, zoomMap));
         });
 
         //Define check-in button
@@ -245,11 +242,7 @@ public class LibraryInfo extends AppCompatActivity
                         if (library.id == libraryId) {
                             libraryLocation = new LatLng(library.latitude, library.longitude);
                             mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
-                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                            builder.include(libraryLocation);
-                            bounds = builder.build();
-                            int padding = 100; // Adjust the padding as needed
-                            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+                            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(libraryLocation, zoomMap));
                             return;
                         }
                     }
@@ -258,7 +251,7 @@ public class LibraryInfo extends AppCompatActivity
 
             @Override
             public void onFailure(Call<List<Library>> call, Throwable t) {
-                // Handle error here
+                // Handle error here&
                 t.printStackTrace();
             }
         });
