@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ import java.util.List;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,9 +34,9 @@ public class BookInfo extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         if (ThemeManager.isDarkThemeEnabled()) {
-            setTheme(R.style.AppThemeLight);
-        } else {
             setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppThemeLight);
         }
 
         super.onCreate(savedInstanceState);
