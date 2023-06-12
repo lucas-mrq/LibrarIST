@@ -14,21 +14,29 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+
 import android.Manifest.permission;
 import android.Manifest;
 
 import android.content.pm.PackageManager;
-import android.content.Intent;
-
-import android.annotation.SuppressLint;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import android.widget.SearchView;
+import android.widget.Toast;
+
+
+import android.content.Intent;
+
+import android.annotation.SuppressLint;
+import android.widget.Button;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,6 +48,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.MapStyleOptions;
 
+import java.io.IOException;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
@@ -79,6 +88,8 @@ public class MainActivity extends AppCompatActivity
     private boolean permissionDenied = false;
 
     private GoogleMap mGoogleMap;
+    private SearchView searchLocation;
+    private SupportMapFragment mapFragment;
     private ApiService apiService;
 
     private List<Library> libraries;
@@ -99,10 +110,52 @@ public class MainActivity extends AppCompatActivity
         //Instantiate ApiService
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
+        // Define search location bar
+         searchLocation = findViewById(R.id.searchLocation);
+
+
+
         //Define the Map in background
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
+        searchLocation.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String location = searchLocation.getQuery().toString();
+                List<Address> addressList = null;
+
+                if (location!= null || !location.equals("")) {
+                    Geocoder geocoder = new Geocoder(MainActivity.this);
+                    try {
+                        addressList = geocoder.getFromLocationName(location, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (addressList != null && !addressList.isEmpty()) {
+                        Address address = addressList.get(0);
+                        LatLng latlng = new LatLng(address.getLatitude(), address.getLongitude());
+                        //mGoogleMap.addMarker(new MarkerOptions().position(latlng).title(location));
+
+                        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15));
+                    } else {
+                        // Handle the case when no address is found
+                        Toast.makeText(MainActivity.this, "Invalid location", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
         mapFragment.getMapAsync(this);
+
+
+
 
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
