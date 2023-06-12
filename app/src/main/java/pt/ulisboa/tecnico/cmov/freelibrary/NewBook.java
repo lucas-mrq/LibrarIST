@@ -22,7 +22,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,9 +59,7 @@ public class NewBook extends AppCompatActivity {
         TextView libraryText = findViewById(R.id.libraryBook2);
         libraryText.setText(libraryName);
 
-        //String codeBarTxt = intent.getStringExtra("code");
-        /* TODO: don't hardcode the bookId */
-        String codeBarTxt = "3";
+        String codeBarTxt = intent.getStringExtra("code");
         TextView codeBar = findViewById(R.id.codeBarSend);
         codeBar.setText(codeBarTxt);
 
@@ -108,35 +109,15 @@ public class NewBook extends AppCompatActivity {
 
         Button registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(view -> {
-            String bookId = codeBarTxt; // Assuming codeBarTxt holds the book ID
+            TextView titleField = findViewById(R.id.nameBook); // Replace with actual id
+            TextView authorField = findViewById(R.id.authorBook); // Replace with actual id
+            TextView isbnField = findViewById(R.id.codeBarSend);
 
-            int libraryId = getIntent().getIntExtra("libraryId", 0); // Replace "libraryId" with the actual key used to pass the library ID
+            String bookTitle = titleField.getText().toString();
+            String bookAuthor = authorField.getText().toString();
+            String bookISBN = isbnField.getText().toString();
 
-            // Call the check-in API
-            Call<Void> checkInCall = apiService.checkInBook(libraryId, Integer.parseInt(bookId));
-            checkInCall.enqueue(new Callback<Void>() {
-                @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(getApplicationContext(), "Book checked in successfully", Toast.LENGTH_SHORT).show();
-
-                        // Start the LibraryInfo activity
-                        Intent intentLibraryInfo = new Intent(NewBook.this, LibraryInfo.class);
-                        intentLibraryInfo.putExtra("libraryId", libraryId);
-                        startActivity(intentLibraryInfo);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Book checked in failed", Toast.LENGTH_SHORT).show();
-                        // Handle the error response
-                        // You can check the response code and display an appropriate error message
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Void> call, Throwable t) {
-                    Log.i("REGISTERTAG", "failure");
-                    // Handle the failure (e.g., network error)
-                }
-            });
+            createAndCheckinBook(bookTitle, bookAuthor, bookISBN);
         });
 
 
@@ -171,5 +152,60 @@ public class NewBook extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private void createAndCheckinBook(String bookTitle, String bookAuthor, String bookISBN) {
+        bookISBN = "99912345";
+        RequestBody titleBody = RequestBody.create(MediaType.parse("text/plain"), bookTitle);
+        RequestBody authorBody = RequestBody.create(MediaType.parse("text/plain"), bookAuthor);
+        RequestBody isbnBody = RequestBody.create(MediaType.parse("text/plain"), bookISBN);
+
+        int libraryId = getIntent().getIntExtra("libraryId", 0); // Replace "libraryId" with the actual key used to pass the library ID
+
+        createBook(titleBody, authorBody, isbnBody, libraryId);
+    }
+
+    private void createBook(RequestBody title, RequestBody author, RequestBody isbn, int libraryId) {
+        Call<Book> createBookCall = apiService.createBook(title, author, isbn);
+        createBookCall.enqueue(new Callback<Book>() {
+            @Override
+            public void onResponse(Call<Book> call, Response<Book> response) {
+                if (response.isSuccessful()) {
+                    Book createdBook = response.body();
+                    checkInBook(libraryId, createdBook.getId());
+                } else {
+                    Toast.makeText(getApplicationContext(), "Book creation failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Book> call, Throwable t) {
+                // Handle the failure (e.g., network error)
+            }
+        });
+    }
+
+    private void checkInBook(int libraryId, int bookId) {
+        Call<Void> checkInCall = apiService.checkInBook(libraryId, bookId);
+        checkInCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "Book checked in successfully", Toast.LENGTH_SHORT).show();
+
+                    // Start the LibraryInfo activity
+                    Intent intentLibraryInfo = new Intent(NewBook.this, LibraryInfo.class);
+                    intentLibraryInfo.putExtra("libraryId", libraryId);
+                    startActivity(intentLibraryInfo);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Book checked in failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // Handle the failure (e.g., network error)
+            }
+        });
     }
 }
