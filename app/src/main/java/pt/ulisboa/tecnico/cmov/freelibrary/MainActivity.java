@@ -17,6 +17,8 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 import android.Manifest.permission;
 import android.Manifest;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.Intent;
 
@@ -34,13 +36,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.MapStyleOptions;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.databinding.ActivityMainBinding;
@@ -149,6 +154,10 @@ public class MainActivity extends AppCompatActivity
 
 
     private void fetchLibraries() {
+        //Get Favorite Libraries
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        Set<String> favoriteLibraryIds = sharedPreferences.getStringSet("favoriteLibraryIds", new HashSet<>());
+
         apiService.getAllLibraries().enqueue(new Callback<List<Library>>() {
             @Override
             public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
@@ -156,7 +165,12 @@ public class MainActivity extends AppCompatActivity
                     libraries = response.body();
                     for (Library library : libraries) {
                         LatLng libraryLocation = new LatLng(library.latitude, library.longitude);
-                        mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
+                        if (favoriteLibraryIds.contains(String.valueOf(library.id))) {
+                            mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                        }
+                        else {
+                            mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
+                        }
                     }
                     zoomToMarkers(); // Call zoomToMarkers after adding markers
                 }
