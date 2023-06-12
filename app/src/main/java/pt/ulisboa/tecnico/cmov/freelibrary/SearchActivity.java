@@ -35,6 +35,7 @@ public class SearchActivity extends AppCompatActivity {
     private List<Book> searchList;
     private List<Integer> searchScore;
     ArrayAdapter<String> adapter;
+    boolean isSearching = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class SearchActivity extends AppCompatActivity {
         //Define the book list
         ListView listView = findViewById(R.id.listBooks);
         listView.setOnItemClickListener((adapterView, view, position, id) -> {
-            Book book = bookList.get(position);
+            Book book = isSearching ? searchList.get(position) : bookList.get(position);
             Intent intent = new Intent(SearchActivity.this, BookInfo.class);
             intent.putExtra("id", book.getId());
             intent.putExtra("title", book.getTitle());
@@ -82,6 +83,7 @@ public class SearchActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                isSearching = true;
                 searchList = new ArrayList<>();
                 searchScore = new ArrayList<>();
 
@@ -206,6 +208,7 @@ public class SearchActivity extends AppCompatActivity {
 
         for(String str : search) {
             for (String word : bookWords) {
+                if (word.equals(str)) {
                     score += str.length();
                 }
             }
@@ -213,4 +216,5 @@ public class SearchActivity extends AppCompatActivity {
 
         return score;
     }
+
 }
