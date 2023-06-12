@@ -43,6 +43,7 @@ public class CheckIn extends AppCompatActivity {
         //Define Library Name
         Intent intent = getIntent();
         String libraryName = intent.getStringExtra("library");
+        int libraryId = intent.getIntExtra("libraryId", 0);
         TextView libraryText = findViewById(R.id.libraryBookName);
         libraryText.setText(libraryName);
 
@@ -53,6 +54,7 @@ public class CheckIn extends AppCompatActivity {
             intent12.putExtra("library", libraryName);
             EditText scanText = findViewById(R.id.codeBar);
             intent12.putExtra("code", String.valueOf(scanText.getText()));
+            intent12.putExtra("libraryId", libraryId);
             startActivity(intent12);
         });
 

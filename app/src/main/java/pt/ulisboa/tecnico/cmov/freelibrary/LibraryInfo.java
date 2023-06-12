@@ -171,6 +171,7 @@ public class LibraryInfo extends AppCompatActivity
         checkInButton.setOnClickListener(view -> {
             Intent intentCheckIn = new Intent(LibraryInfo.this, CheckIn.class);
             intentCheckIn.putExtra("library", name);
+            intentCheckIn.putExtra("libraryId", libraryId);
             startActivity(intentCheckIn);
         });
 
