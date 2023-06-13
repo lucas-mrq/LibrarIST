@@ -1,10 +1,13 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import android.widget.ArrayAdapter;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -127,7 +131,39 @@ public class BookInfo extends AppCompatActivity {
             }
         });
 
-        //Define Theme Button
+        ImageView shareButton = findViewById(R.id.share);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, title);
+                shareIntent.putExtra(Intent.EXTRA_TITLE,"You have to read this book !");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "You have to read this book !"); // the subject of an email
+
+                // (Optional) Here you're passing a content URI to an image to be displayed
+                //shareIntent.setData(uri);
+                //shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                // Show the Sharesheet
+                shareIntent.setType("text/plain");
+                startActivity(Intent.createChooser(shareIntent, null));
+
+                /* Try to shar just an image
+                Context context = BookInfo.this;
+                int imageResourceId = context.getResources().getIdentifier("free_library_example", "drawable", context.getPackageName());
+                Uri uri = Uri.parse("android.resource://" + context.getPackageName() + "/" + imageResourceId);
+                if (uri != null) {
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    shareIntent.setType("image/*");
+                    startActivity(Intent.createChooser(shareIntent, null));
+                }
+                else {
+                    Log.e("BookInfo", "Failed to create URI for the image resource");
+                }*/
+            }
+        });
+
+            //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
 
