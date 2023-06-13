@@ -1,7 +1,9 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 
 import android.location.Address;
 import android.location.Geocoder;
@@ -25,7 +27,9 @@ import androidx.core.content.ContextCompat;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
@@ -86,21 +90,31 @@ public class LibraryInfo extends AppCompatActivity
         TextView titleText = (TextView) findViewById(R.id.libraryName);
         titleText.setText(name);
 
-        //Define Favorite library button => Temporary as a Text variable / store in server in future
-        final Button[] favoriteButton = {(Button) findViewById(R.id.favoriteButton)};
-        final boolean[] isFavorite = {intent.getBooleanExtra("favorite", false)};
+        //Get Favorite Libraries
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        Set<String> favoriteLibraryIds = sharedPreferences.getStringSet("favoriteLibraryIds", new HashSet<>());
+
+        final boolean[] isFavorite = {favoriteLibraryIds.contains(String.valueOf(libraryId))};
+
+        final Button favoriteButton = findViewById(R.id.favoriteButton);
         if (isFavorite[0]) {
-            favoriteButton[0].setText("★");
+            favoriteButton.setText("★");
         } else {
-            favoriteButton[0].setText("✩");
+            favoriteButton.setText("✩");
         }
-        favoriteButton[0].setOnClickListener(view -> {
+        favoriteButton.setOnClickListener(view -> {
             if (isFavorite[0]) {
-                favoriteButton[0].setText("✩");
+                favoriteButton.setText("✩");
+                favoriteLibraryIds.remove(String.valueOf(libraryId));
             } else {
-                favoriteButton[0].setText("★");
+                favoriteButton.setText("★");
+                favoriteLibraryIds.add(String.valueOf(libraryId));
             }
             isFavorite[0] = !isFavorite[0];
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putStringSet("favoriteLibraryIds", favoriteLibraryIds);
+            editor.apply();
         });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

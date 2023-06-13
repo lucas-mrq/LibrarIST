@@ -19,6 +19,8 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 import android.Manifest.permission;
 import android.Manifest;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -42,14 +44,17 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.MapStyleOptions;
 
-import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.io.IOException;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.databinding.ActivityMainBinding;
@@ -91,7 +96,7 @@ public class MainActivity extends AppCompatActivity
     private SearchView searchLocation;
     private SupportMapFragment mapFragment;
     private ApiService apiService;
-
+    private Marker searchMarker;
     private List<Library> libraries;
 
     @Override
@@ -118,6 +123,7 @@ public class MainActivity extends AppCompatActivity
         //Define the Map in background
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
+
         searchLocation.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -135,9 +141,13 @@ public class MainActivity extends AppCompatActivity
                     if (addressList != null && !addressList.isEmpty()) {
                         Address address = addressList.get(0);
                         LatLng latlng = new LatLng(address.getLatitude(), address.getLongitude());
-                        //mGoogleMap.addMarker(new MarkerOptions().position(latlng).title(location));
-
                         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15));
+
+                        if (searchMarker == null) {
+                            searchMarker = mGoogleMap.addMarker(new MarkerOptions().position(latlng).title("search Position").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                        } else {
+                            searchMarker.setPosition(latlng);
+                        }
                     } else {
                         // Handle the case when no address is found
                         Toast.makeText(MainActivity.this, "Invalid location", Toast.LENGTH_SHORT).show();
@@ -202,6 +212,10 @@ public class MainActivity extends AppCompatActivity
 
 
     private void fetchLibraries() {
+        //Get Favorite Libraries
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        Set<String> favoriteLibraryIds = sharedPreferences.getStringSet("favoriteLibraryIds", new HashSet<>());
+
         apiService.getAllLibraries().enqueue(new Callback<List<Library>>() {
             @Override
             public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
@@ -209,7 +223,12 @@ public class MainActivity extends AppCompatActivity
                     libraries = response.body();
                     for (Library library : libraries) {
                         LatLng libraryLocation = new LatLng(library.latitude, library.longitude);
-                        mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
+                        if (favoriteLibraryIds.contains(String.valueOf(library.id))) {
+                            mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                        }
+                        else {
+                            mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                        }
                     }
                     zoomToMarkers(); // Call zoomToMarkers after adding markers
                 }
