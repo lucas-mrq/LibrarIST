@@ -3,11 +3,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <SearchView
-        android:id="@+id/searchView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:queryHint="Search..." />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -19,6 +14,16 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+        <SearchView
+            android:id="@+id/searchLocation"
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/search_bar"
+            android:queryHint="Search address" />
 
         <include layout="@layout/bottom_layout" />
 
