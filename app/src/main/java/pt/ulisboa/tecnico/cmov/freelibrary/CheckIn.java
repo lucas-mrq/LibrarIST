@@ -13,6 +13,7 @@ import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -24,12 +25,23 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
 
+import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
+import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class CheckIn extends AppCompatActivity {
+    private ApiService apiService;
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //Instantiate ApiService
+        apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
         if (ThemeManager.isDarkThemeEnabled()) {
             setTheme(R.style.AppThemeDark);
@@ -43,17 +55,45 @@ public class CheckIn extends AppCompatActivity {
         //Define Library Name
         Intent intent = getIntent();
         String libraryName = intent.getStringExtra("library");
+        int libraryId = intent.getIntExtra("libraryId", 0);
         TextView libraryText = findViewById(R.id.libraryBookName);
         libraryText.setText(libraryName);
 
         //Define Map & Search Buttons
         Button checkInButton = findViewById(R.id.checkInRegisterButton);
         checkInButton.setOnClickListener(view -> {
-            Intent intent12 = new Intent(CheckIn.this, NewBook.class);
-            intent12.putExtra("library", libraryName);
+
             EditText scanText = findViewById(R.id.codeBar);
-            intent12.putExtra("code", String.valueOf(scanText.getText()));
-            startActivity(intent12);
+            String isbn = scanText.getText().toString();
+
+            // Call the API to get the book by ISBN
+            Call<Book> getBookCall = apiService.getBookByIsbn(isbn);
+            getBookCall.enqueue(new Callback<Book>() {
+                @Override
+                public void onResponse(Call<Book> call, Response<Book> response) {
+                    if (response.isSuccessful()) {
+                        Book book = response.body();
+                        if (book != null) {
+                            int bookId = book.getId();
+
+                            // Call the method to check in the book
+                            checkInBook(libraryId, bookId);
+                        }
+                    } else {
+                        // Book not found, create a new book
+                        Intent intentNewBook = new Intent(CheckIn.this, NewBook.class);
+                        intentNewBook.putExtra("library", libraryName);
+                        intentNewBook.putExtra("code", isbn);
+                        intentNewBook.putExtra("libraryId", libraryId);
+                        startActivity(intentNewBook);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Book> call, Throwable t) {
+                    // Handle the failure (e.g., network error)
+                }
+            });
         });
 
         initialiseDetectorsAndSources();
@@ -160,5 +200,29 @@ public class CheckIn extends AppCompatActivity {
             getSupportActionBar().hide();
         }
         initialiseDetectorsAndSources();
+    }
+
+    private void checkInBook(int libraryId, int bookId) {
+        Call<Void> checkInCall = apiService.checkInBook(libraryId, bookId);
+        checkInCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "Book checked in successfully", Toast.LENGTH_SHORT).show();
+
+                    // Start the LibraryInfo activity
+                    Intent intentLibraryInfo = new Intent(CheckIn.this, LibraryInfo.class);
+                    intentLibraryInfo.putExtra("libraryId", libraryId);
+                    startActivity(intentLibraryInfo);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Book checked in failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // Handle the failure (e.g., network error)
+            }
+        });
     }
 }
