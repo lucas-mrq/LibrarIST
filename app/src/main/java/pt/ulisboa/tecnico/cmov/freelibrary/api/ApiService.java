@@ -12,6 +12,9 @@ public interface ApiService {
     @GET("api/books/{id}")
     Call<Book> getBookById(@Path("id") int id);
 
+    @GET("api/books/isbn/{isbn}")
+    Call<Book> getBookByIsbn(@Path("isbn") String isbn);
+
     @GET("api/books/library/{id}")
     Call<List<Book>> getBooksByLibraryId(@Path("id") int id);
 
