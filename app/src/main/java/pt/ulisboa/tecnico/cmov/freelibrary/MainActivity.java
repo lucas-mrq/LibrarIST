@@ -264,9 +264,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLibraryClick(boolean isFavorite, String name, String address, int libraryId) {
         Intent intent = new Intent(MainActivity.this, LibraryInfo.class);
-        intent.putExtra("favorite", isFavorite);
         intent.putExtra("name", name);
-        intent.putExtra("address", address);
         intent.putExtra("libraryId", libraryId);
         startActivity(intent);
     }

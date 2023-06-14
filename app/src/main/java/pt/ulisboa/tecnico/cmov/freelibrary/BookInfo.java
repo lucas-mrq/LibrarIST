@@ -42,7 +42,7 @@ import retrofit2.Response;
 public class BookInfo extends AppCompatActivity {
 
     private ApiService apiService;
-
+    private List<Library> allLibraries = new ArrayList<>();
     private boolean activeNotifications = false;
 
     @Override
@@ -115,6 +115,7 @@ public class BookInfo extends AppCompatActivity {
                             libraries.add(library);
                         }
                     }
+
                     List<Library> favoriteLibraries = new ArrayList<>();
                     List<Library> otherLibraries = new ArrayList<>();
                     for (Library library : libraries) {
@@ -124,6 +125,10 @@ public class BookInfo extends AppCompatActivity {
                             otherLibraries.add(library);
                         }
                     }
+
+                    allLibraries.addAll(favoriteLibraries);
+                    allLibraries.addAll(otherLibraries);
+
                     for (Library library : favoriteLibraries) {
                         String favoriteLibrary = "☆ " + library.getName() + " ☆";
                         availabilityList.add(favoriteLibrary);
@@ -142,6 +147,14 @@ public class BookInfo extends AppCompatActivity {
             public void onFailure(Call<List<Library>> call, Throwable t) {
                 // handle failure scenario here
             }
+        });
+
+        availabilityListView.setOnItemClickListener((adapterView, view, position, id) -> {
+            Library library = allLibraries.get(position);
+            Intent intentLibrary = new Intent(BookInfo.this, LibraryInfo.class);
+            intentLibrary.putExtra("name", library.getName());
+            intentLibrary.putExtra("libraryId", library.getId());
+            startActivity(intentLibrary);
         });
 
         ImageButton notificationIcon = findViewById(R.id.notifications);
