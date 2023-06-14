@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".BookInfo">
 
-    <include layout="@layout/bottom_layout" />
+    <include
+        android:id="@+id/include6"
+        layout="@layout/bottom_layout" />
 
     <TextView
         android:id="@+id/bookTitle"
@@ -42,10 +44,11 @@
 
     <ImageView
         android:id="@+id/cover"
-        android:layout_width="172dp"
-        android:layout_height="278dp"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
         android:layout_marginEnd="15dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/bookAuthor"
         app:layout_constraintTop_toTopOf="@+id/bookAuthor"
         app:srcCompat="@drawable/les_miserables_cover" />
 
@@ -58,15 +61,16 @@
         android:textSize="24dp"
         android:textStyle="bold"
         app:autoSizeTextType="uniform"
-        app:layout_constraintStart_toStartOf="@+id/textLanguage"
+        app:layout_constraintStart_toStartOf="@+id/share"
         app:layout_constraintTop_toBottomOf="@+id/cover" />
 
     <ListView
         android:id="@+id/listofLibraryWhereBookAvailable"
-        android:layout_width="349dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/buttonLayout"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="45dp"
+        app:layout_constraintBottom_toBottomOf="@+id/include6"
+        app:layout_constraintEnd_toEndOf="@+id/cover"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/Availability"
         app:layout_constraintTop_toBottomOf="@+id/Availability" />
