@@ -2,24 +2,28 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.ActionMenuItemView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -28,7 +32,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
@@ -38,26 +41,21 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
-import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
-
 
 public class NewLibrary extends AppCompatActivity implements
-        OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener {
+        OnMapReadyCallback
+         {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private GoogleMap mGoogleMap;
     private SearchView searchLocation;
     private SupportMapFragment mapFragment;
-    private Marker searchMarker;
     private Marker newLocationMarker;
     private TextView libraryLocationText;
 
@@ -70,6 +68,11 @@ public class NewLibrary extends AppCompatActivity implements
     private CheckBox currentLocationCheckbox;
 
     private LatLng newLibraryLocation;
+
+    private static final int REQUEST_CAMERA_PERMISSION = 1;
+
+    private ActivityResultLauncher<Intent> imageLibrary;
+
 
 
     @Override
@@ -102,9 +105,68 @@ public class NewLibrary extends AppCompatActivity implements
             startActivity(intentSearch);
         });
 
+        imageLibrary = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent data = result.getData();
+                if (data != null) {
+                    Uri uri = data.getData();
+                    ImageView libraryImage = findViewById(R.id.libraryImage);
+                    if (uri == null) {
+                        Bundle extras = data.getExtras();
+                        if (extras != null) {
+                            Bitmap imageBitmap = (Bitmap) extras.get("data");
+                            libraryImage.setImageBitmap(imageBitmap);
+                        }
+                    } else {
+                        libraryImage.setImageURI(uri);
+                    }
+                }
+            }
+        });
+
+        Button fileLibraryButton = findViewById(R.id.filePhoto);
+        fileLibraryButton.setOnClickListener(view -> {
+            Intent intentFilePhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intentFilePhoto.setType("image/*");
+
+            if (intentFilePhoto.resolveActivity(getPackageManager()) != null) {
+                imageLibrary.launch(intentFilePhoto);
+            }
+        });
+
+        Button cameraBookButton = findViewById(R.id.cameraPhoto);
+        cameraBookButton.setOnClickListener(view -> {
+            // Ask CAMERA permission
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            } else {
+                Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                if (intentCamera.resolveActivity(getPackageManager()) != null) {
+                    imageLibrary.launch(intentCamera);
+                }
+            }
+        });
+
+        Button registerButton = findViewById(R.id.registerButton);
+        registerButton.setOnClickListener(view -> {
+            /* Change to library features
+            TextView titleField = findViewById(R.id.nameBook); // Replace with actual id
+            TextView authorField = findViewById(R.id.authorBook); // Replace with actual id
+            TextView isbnField = findViewById(R.id.codeBarSend);
+
+            String bookTitle = titleField.getText().toString();
+            String bookAuthor = authorField.getText().toString();
+            String bookISBN = isbnField.getText().toString();
+
+            createAndCheckinBook(bookTitle, bookAuthor, bookISBN);
+
+            */
+        });
+
+
         //Define edit Location Button
         libraryLocationText = (TextView) findViewById(R.id.libraryLocationText);
-
 
         // Define CheckBoxes
         markerCheckBox = findViewById(R.id.checkBoxMarker);
@@ -168,11 +230,11 @@ public class NewLibrary extends AppCompatActivity implements
                                     }
                                 });
                     }
-
-
                 }
                 else {
-                    markerCheckBox.setChecked(true);
+                    if (markerCheckBox.isEnabled()) {
+                        markerCheckBox.setChecked(true);
+                    }
                 }
             }
         });
@@ -204,10 +266,12 @@ public class NewLibrary extends AppCompatActivity implements
                         LatLng latlng = new LatLng(address.getLatitude(), address.getLongitude());
                         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15));
 
-                        if (searchMarker == null) {
-                            searchMarker = mGoogleMap.addMarker(new MarkerOptions().position(latlng).title("search Position").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                        if (newLocationMarker == null) {
+                            newLocationMarker = mGoogleMap.addMarker(new MarkerOptions().position(latlng).draggable(true));
+                            markerCheckBox.setEnabled(true);
+                            markerCheckBox.setChecked(true);
                         } else {
-                            searchMarker.setPosition(latlng);
+                            newLocationMarker.setPosition(latlng);
                         }
                     } else {
                         // Handle the case when no address is found
@@ -313,12 +377,6 @@ public class NewLibrary extends AppCompatActivity implements
             }
         });
 
-    }
-
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        return true;
     }
 
     /**
