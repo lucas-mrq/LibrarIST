@@ -64,7 +64,7 @@
     <ListView
         android:id="@+id/listofLibraryWhereBookAvailable"
         android:layout_width="349dp"
-        android:layout_height="315dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/buttonLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -81,5 +81,17 @@
         app:layout_constraintStart_toStartOf="@+id/textAuthor"
         app:layout_constraintTop_toBottomOf="@+id/textAuthor"
         app:srcCompat="@drawable/notifications_off" />
+
+    <ImageButton
+        android:id="@+id/share"
+        android:layout_width="40dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="@+id/notifications"
+        app:layout_constraintTop_toBottomOf="@+id/notifications"
+        app:srcCompat="@drawable/share" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
