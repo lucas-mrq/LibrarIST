@@ -51,7 +51,13 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_search_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_search);
+        }
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
@@ -142,14 +148,8 @@ public class SearchActivity extends AppCompatActivity {
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(SearchActivity.this, MainActivity.class);
+            intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
-        });
-
-        //Define Search Buttons
-        Button searchButton = (Button) findViewById(R.id.searchMenu);
-        searchButton.setOnClickListener(view -> {
-            Intent intentSearch = new Intent(SearchActivity.this, SearchActivity.class);
-            startActivity(intentSearch);
         });
     }
 
@@ -169,7 +169,19 @@ public class SearchActivity extends AppCompatActivity {
                             public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
                                 if (response.isSuccessful()) {
                                     List<Book> libraryBooks = response.body();
-                                    bookList.addAll(libraryBooks);
+                                    for (Book book : libraryBooks) {
+                                        boolean bookExists = false;
+                                        for (Book existingBook : bookList) {
+                                            if (existingBook.getTitle().equals(book.getTitle())) {
+                                                bookExists = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!bookExists) {
+                                            bookList.add(book);
+                                        }
+                                    }
+
                                 }
 
                                 int count = fetchedCount.incrementAndGet();
@@ -240,5 +252,11 @@ public class SearchActivity extends AppCompatActivity {
         } else {
             resources.updateConfiguration(config, resources.getDisplayMetrics());
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 }

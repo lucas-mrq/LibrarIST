@@ -11,9 +11,10 @@
     <string name="library">Biblioteca: </string>
     <string name="title">Titolo: </string>
     <string name="barcode">Codice a barre:</string>
-    <string name="selectpicture">Seleziona l'immagine del libro:</string>
+    <string name="selectpicture">Seleziona l\'immagine del libro:</string>
     <string name="fromcamera">dalla Fotocamera</string>
     <string name="fromfile">dal File</string>
     <string name="register">Registra nuovo libro</string>
     <string name="booksearch">Cerca libro</string>
+    <string name="unknown">Libro sconosciuto</string>
 </resources>

@@ -14,6 +14,7 @@ import android.os.Build;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -84,7 +85,13 @@ public class LibraryInfo extends AppCompatActivity
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_library_info);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_library_info_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_library_info);
+        }
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
@@ -157,7 +164,6 @@ public class LibraryInfo extends AppCompatActivity
                     startActivity(intent1);
                 });
             }
-
             @Override
             public void onFetchFailed() {
                 // Handle the fetch failure
@@ -184,12 +190,21 @@ public class LibraryInfo extends AppCompatActivity
             startActivity(intentCheckIn);
         });
 
+        //Define check-out button
+        Button checkOutButton = (Button) findViewById(R.id.outButton);
+        checkOutButton.setOnClickListener(view -> {
+            Intent intentCheckIn = new Intent(LibraryInfo.this, CheckIn.class);
+            intentCheckIn.putExtra("library", name);
+            intentCheckIn.putExtra("libraryId", libraryId);
+            startActivity(intentCheckIn);
+        });
+
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
 
         // Define share button
-        ImageView shareButton = findViewById(R.id.share);
+        ImageButton shareButton = findViewById(R.id.share);
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -209,6 +224,7 @@ public class LibraryInfo extends AppCompatActivity
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(LibraryInfo.this, MainActivity.class);
+            intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
         });
 
@@ -216,6 +232,7 @@ public class LibraryInfo extends AppCompatActivity
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(LibraryInfo.this, SearchActivity.class);
+            intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
     }
@@ -358,4 +375,9 @@ public class LibraryInfo extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
+    }
 }

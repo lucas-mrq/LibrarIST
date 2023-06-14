@@ -7,20 +7,20 @@
     tools:context=".BookInfo">
 
     <include
-        android:id="@+id/include6"
-        layout="@layout/bottom_layout" />
+        android:id="@+id/include4"
+        layout="@layout/bottom_layout_horizontal" />
 
     <TextView
         android:id="@+id/bookTitle"
         android:layout_width="272dp"
         android:layout_height="34dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="15dp"
-        android:gravity="center"
+        android:gravity="left"
         android:text="bookTitle"
         android:textSize="32dp"
         android:textStyle="bold"
         app:autoSizeTextType="uniform"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,6 +28,7 @@
         android:id="@+id/bookAuthor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:text="bookAuthor"
         app:layout_constraintStart_toEndOf="@+id/textAuthor"
         app:layout_constraintTop_toTopOf="@+id/textAuthor" />
@@ -45,46 +46,45 @@
     <ImageView
         android:id="@+id/cover"
         android:layout_width="0dp"
-        android:layout_height="300dp"
-        android:layout_marginStart="15dp"
+        android:layout_height="0dp"
         android:layout_marginEnd="15dp"
+        android:layout_marginBottom="45dp"
+        app:layout_constraintBottom_toBottomOf="@+id/include4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/bookAuthor"
-        app:layout_constraintTop_toTopOf="@+id/bookAuthor"
+        app:layout_constraintStart_toEndOf="@+id/listofLibraryWhereBookAvailable"
+        app:layout_constraintTop_toTopOf="@+id/bookTitle"
         app:srcCompat="@drawable/les_miserables_cover" />
 
     <TextView
         android:id="@+id/Availability"
         android:layout_width="121dp"
         android:layout_height="35dp"
+        android:layout_marginTop="15dp"
         android:gravity="center"
         android:text="@string/availability"
-        android:textSize="24dp"
+        android:textSize="15dp"
         android:textStyle="bold"
         app:autoSizeTextType="uniform"
-        app:layout_constraintStart_toStartOf="@+id/share"
-        app:layout_constraintTop_toBottomOf="@+id/cover" />
+        app:layout_constraintStart_toStartOf="@+id/textAuthor"
+        app:layout_constraintTop_toBottomOf="@+id/textAuthor" />
 
     <ListView
         android:id="@+id/listofLibraryWhereBookAvailable"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="45dp"
-        app:layout_constraintBottom_toBottomOf="@+id/include6"
-        app:layout_constraintEnd_toEndOf="@+id/cover"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/Availability"
+        android:layout_width="400dp"
+        android:layout_height="220dp"
+        app:layout_constraintStart_toStartOf="@+id/textAuthor"
         app:layout_constraintTop_toBottomOf="@+id/Availability" />
 
     <ImageButton
         android:id="@+id/notifications"
         android:layout_width="40dp"
         android:layout_height="41dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
         android:background="@color/white"
         android:scaleType="fitXY"
-        app:layout_constraintStart_toStartOf="@+id/textAuthor"
-        app:layout_constraintTop_toBottomOf="@+id/textAuthor"
+        app:layout_constraintBottom_toBottomOf="@+id/bookTitle"
+        app:layout_constraintEnd_toStartOf="@+id/cover"
+        app:layout_constraintTop_toTopOf="@+id/bookTitle"
         app:srcCompat="@drawable/notifications_off" />
 
     <ImageButton
@@ -97,6 +97,5 @@
         app:layout_constraintStart_toStartOf="@+id/notifications"
         app:layout_constraintTop_toBottomOf="@+id/notifications"
         app:srcCompat="@drawable/share" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

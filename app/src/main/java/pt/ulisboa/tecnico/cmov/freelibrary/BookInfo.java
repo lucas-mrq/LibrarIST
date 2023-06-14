@@ -16,6 +16,7 @@ import android.view.View;
 
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
 
@@ -41,7 +43,7 @@ import retrofit2.Response;
 public class BookInfo extends AppCompatActivity {
 
     private ApiService apiService;
-
+    private List<Library> allLibraries = new ArrayList<>();
     private boolean activeNotifications = false;
 
     @Override
@@ -54,7 +56,13 @@ public class BookInfo extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_info);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_book_info_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_book_info);
+        }
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
@@ -92,7 +100,23 @@ public class BookInfo extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
                 if(response.isSuccessful() && response.body() != null) {
-                    List<Library> libraries = response.body();
+
+                    List<Library> multipleLibraries = response.body();
+                    List<Library> libraries = new ArrayList<>();
+
+                    for (Library library : multipleLibraries) {
+                        boolean libraryExists = false;
+                        for (Library uniqueLibrary : libraries) {
+                            if (uniqueLibrary.getName().equals(library.getName())) {
+                                libraryExists = true;
+                                break;
+                            }
+                        }
+                        if (!libraryExists) {
+                            libraries.add(library);
+                        }
+                    }
+
                     List<Library> favoriteLibraries = new ArrayList<>();
                     List<Library> otherLibraries = new ArrayList<>();
                     for (Library library : libraries) {
@@ -102,8 +126,13 @@ public class BookInfo extends AppCompatActivity {
                             otherLibraries.add(library);
                         }
                     }
+
+                    allLibraries.addAll(favoriteLibraries);
+                    allLibraries.addAll(otherLibraries);
+
                     for (Library library : favoriteLibraries) {
-                        availabilityList.add(HtmlCompat.fromHtml("<b>" + library.getName() + "</b>", HtmlCompat.FROM_HTML_MODE_LEGACY).toString());
+                        String favoriteLibrary = "☆ " + library.getName() + " ☆";
+                        availabilityList.add(favoriteLibrary);
                     }
                     for (Library library : otherLibraries) {
                         availabilityList.add(library.getName());
@@ -121,7 +150,15 @@ public class BookInfo extends AppCompatActivity {
             }
         });
 
-        ImageView notificationIcon = findViewById(R.id.notifications);
+        availabilityListView.setOnItemClickListener((adapterView, view, position, id) -> {
+            Library library = allLibraries.get(position);
+            Intent intentLibrary = new Intent(BookInfo.this, LibraryInfo.class);
+            intentLibrary.putExtra("name", library.getName());
+            intentLibrary.putExtra("libraryId", library.getId());
+            startActivity(intentLibrary);
+        });
+
+        ImageButton notificationIcon = findViewById(R.id.notifications);
         notificationIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,7 +174,7 @@ public class BookInfo extends AppCompatActivity {
             }
         });
 
-        ImageView shareButton = findViewById(R.id.share);
+        ImageButton shareButton = findViewById(R.id.share);
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -178,6 +215,7 @@ public class BookInfo extends AppCompatActivity {
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(BookInfo.this, MainActivity.class);
+            intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
         });
 
@@ -185,6 +223,7 @@ public class BookInfo extends AppCompatActivity {
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(BookInfo.this, SearchActivity.class);
+            intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
     }
@@ -205,5 +244,11 @@ public class BookInfo extends AppCompatActivity {
         } else {
             resources.updateConfiguration(config, resources.getDisplayMetrics());
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 }

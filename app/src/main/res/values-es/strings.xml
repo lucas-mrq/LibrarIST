@@ -16,4 +16,5 @@
     <string name="fromfile">desde el Archivo</string>
     <string name="register">Registrar nuevo libro</string>
     <string name="booksearch">Buscar libro</string>
+    <string name="unknown">Libro desconocido</string>
 </resources>

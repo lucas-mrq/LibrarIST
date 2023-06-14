@@ -40,7 +40,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CheckIn extends AppCompatActivity {
+public class CheckOut extends AppCompatActivity {
     private ApiService apiService;
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
@@ -78,9 +78,9 @@ public class CheckIn extends AppCompatActivity {
         libraryText.setText(libraryName);
 
         //Define Map & Search Buttons
-        Button checkInButton = findViewById(R.id.checkInRegisterButton);
-        checkInButton.setOnClickListener(view -> {
-            checkInScanCode(intent);
+        Button checkOutButton = findViewById(R.id.checkInRegisterButton);
+        checkOutButton.setOnClickListener(view -> {
+            checkOutScanCode(intent);
         });
 
         initialiseDetectorsAndSources(intent);
@@ -92,7 +92,7 @@ public class CheckIn extends AppCompatActivity {
         //Define Map Buttons
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
-            Intent intentMap = new Intent(CheckIn.this, MainActivity.class);
+            Intent intentMap = new Intent(CheckOut.this, MainActivity.class);
             intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
         });
@@ -100,7 +100,7 @@ public class CheckIn extends AppCompatActivity {
         //Define Search Buttons
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
-            Intent intentSearch = new Intent(CheckIn.this, SearchActivity.class);
+            Intent intentSearch = new Intent(CheckOut.this, SearchActivity.class);
             intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
@@ -121,10 +121,10 @@ public class CheckIn extends AppCompatActivity {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(CheckIn.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(CheckOut.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(surfaceView.getHolder());
                     } else {
-                        ActivityCompat.requestPermissions(CheckIn.this, new
+                        ActivityCompat.requestPermissions(CheckOut.this, new
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
                 } catch (IOException e) {
@@ -176,29 +176,8 @@ public class CheckIn extends AppCompatActivity {
         }
     }
 
-    private void checkInBook(int libraryId, int bookId) {
-        Call<Void> checkInCall = apiService.checkInBook(libraryId, bookId);
-        checkInCall.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "Book checked in successfully", Toast.LENGTH_SHORT).show();
-
-                    // Start the LibraryInfo activity
-                    Intent intentLibraryInfo = new Intent(CheckIn.this, LibraryInfo.class);
-                    intentLibraryInfo.putExtra("libraryId", libraryId);
-                    startActivity(intentLibraryInfo);
-                    finish();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Book checked in failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                // Handle the failure (e.g., network error)
-            }
-        });
+    private void CheckOutBook(int libraryId, int bookId) {
+        //ToDo
     }
 
     public void setLocale(String language) {
@@ -243,7 +222,7 @@ public class CheckIn extends AppCompatActivity {
                 if (count > maxCount) {
                     maxCount = count;
                     mostFrequentValue = value;
-                    if (maxCount > 20) checkInScanCode(intent);
+                    if (maxCount > 20) checkOutScanCode(intent);
                 }
             }
 
@@ -251,7 +230,7 @@ public class CheckIn extends AppCompatActivity {
         }
     }
 
-    public void checkInScanCode(Intent intent){
+    public void checkOutScanCode(Intent intent){
         EditText scanText = findViewById(R.id.codeBar);
         String isbn = scanText.getText().toString();
 
@@ -269,19 +248,13 @@ public class CheckIn extends AppCompatActivity {
                         int bookId = book.getId();
 
                         // Call the method to check in the book
-                        checkInBook(libraryId, bookId);
-                        Intent intentCheckIn = new Intent(CheckIn.this, MainActivity.class);
-                        startActivity(intentCheckIn);
+                        // checkOutBook(libraryId, bookId);
+                        Intent intentCheckOut = new Intent(CheckOut.this, MainActivity.class);
+                        startActivity(intentCheckOut);
                         finish();
                     }
                 } else {
-                    // Book not found, create a new book
-                    Intent intentNewBook = new Intent(CheckIn.this, NewBook.class);
-                    intentNewBook.putExtra("library", libraryName);
-                    intentNewBook.putExtra("code", isbn);
-                    intentNewBook.putExtra("libraryId", libraryId);
-                    startActivity(intentNewBook);
-                    finish();
+                    Toast.makeText(CheckOut.this, "@string/unknown", Toast.LENGTH_SHORT).show();
                 }
             }
 

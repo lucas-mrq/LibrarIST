@@ -19,6 +19,7 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 import android.Manifest.permission;
 import android.Manifest;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -34,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.util.Log;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -113,8 +115,13 @@ public class MainActivity extends AppCompatActivity
         }
 
         super.onCreate(savedInstanceState);
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_main_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_main);
+        }
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
@@ -174,17 +181,11 @@ public class MainActivity extends AppCompatActivity
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
 
-        //Define Map Buttons
-        Button mapButton = (Button) findViewById(R.id.mapMenu);
-        mapButton.setOnClickListener(view -> {
-            Intent intentMap = new Intent(MainActivity.this, MainActivity.class);
-            startActivity(intentMap);
-        });
-
         //Define Search Buttons
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(MainActivity.this, SearchActivity.class);
+            intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
     }
@@ -263,9 +264,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLibraryClick(boolean isFavorite, String name, String address, int libraryId) {
         Intent intent = new Intent(MainActivity.this, LibraryInfo.class);
-        intent.putExtra("favorite", isFavorite);
         intent.putExtra("name", name);
-        intent.putExtra("address", address);
         intent.putExtra("libraryId", libraryId);
         startActivity(intent);
     }
@@ -368,5 +367,11 @@ public class MainActivity extends AppCompatActivity
         } else {
             resources.updateConfiguration(config, resources.getDisplayMetrics());
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 }
