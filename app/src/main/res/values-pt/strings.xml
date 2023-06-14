@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">FreeLibrary</string>
+    <string name="search">Livros</string>
+    <string name="map">Mapa</string>
+    <string name="permission_required_toast">Permissão necessária</string>
+    <string name="search_hint">Pesquisar endereço</string>
+    <string name="author">Autor: </string>
+    <string name="availability">Disponibilidade: </string>
+    <string name="checkin">Registrar</string>
+    <string name="checkout">Retirar</string>
+    <string name="library">Biblioteca: </string>
+    <string name="title">Título: </string>
+    <string name="barcode">Código de barras:</string>
+    <string name="selectpicture">Por favor, selecione a imagem do livro:</string>
+    <string name="fromcamera">da Câmera</string>
+    <string name="fromfile">do Arquivo</string>
+    <string name="register">Registrar novo livro</string>
+    <string name="booksearch">Pesquisar livro</string>
+</resources>
