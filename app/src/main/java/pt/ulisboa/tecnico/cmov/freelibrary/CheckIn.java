@@ -27,7 +27,11 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
@@ -40,6 +44,7 @@ public class CheckIn extends AppCompatActivity {
     private ApiService apiService;
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
+    private List<String> codeBarList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,48 +74,16 @@ public class CheckIn extends AppCompatActivity {
         //Define Library Name
         Intent intent = getIntent();
         String libraryName = intent.getStringExtra("library");
-        int libraryId = intent.getIntExtra("libraryId", 0);
         TextView libraryText = findViewById(R.id.libraryBookName);
         libraryText.setText(libraryName);
 
         //Define Map & Search Buttons
         Button checkInButton = findViewById(R.id.checkInRegisterButton);
         checkInButton.setOnClickListener(view -> {
-
-            EditText scanText = findViewById(R.id.codeBar);
-            String isbn = scanText.getText().toString();
-
-            // Call the API to get the book by ISBN
-            Call<Book> getBookCall = apiService.getBookByIsbn(isbn);
-            getBookCall.enqueue(new Callback<Book>() {
-                @Override
-                public void onResponse(Call<Book> call, Response<Book> response) {
-                    if (response.isSuccessful()) {
-                        Book book = response.body();
-                        if (book != null) {
-                            int bookId = book.getId();
-
-                            // Call the method to check in the book
-                            checkInBook(libraryId, bookId);
-                        }
-                    } else {
-                        // Book not found, create a new book
-                        Intent intentNewBook = new Intent(CheckIn.this, NewBook.class);
-                        intentNewBook.putExtra("library", libraryName);
-                        intentNewBook.putExtra("code", isbn);
-                        intentNewBook.putExtra("libraryId", libraryId);
-                        startActivity(intentNewBook);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Book> call, Throwable t) {
-                    // Handle the failure (e.g., network error)
-                }
-            });
+            checkInScanCode(intent);
         });
 
-        initialiseDetectorsAndSources();
+        initialiseDetectorsAndSources(intent);
 
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
@@ -131,7 +104,7 @@ public class CheckIn extends AppCompatActivity {
         });
     }
 
-    private void initialiseDetectorsAndSources() {
+    private void initialiseDetectorsAndSources(Intent intent) {
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
@@ -172,25 +145,11 @@ public class CheckIn extends AppCompatActivity {
             public void release() {
             }
 
-            EditText barcodeText = findViewById(R.id.codeBar);
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if (barcodes.size() != 0) {
-                    barcodeText.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            String barcodeData;
-                            if (barcodes.valueAt(0).email != null) {
-                                barcodeText.removeCallbacks(null);
-                                barcodeData = barcodes.valueAt(0).email.address;
-                                barcodeText.setText(barcodeData);
-                            } else {
-                                barcodeData = barcodes.valueAt(0).displayValue;
-                                barcodeText.setText(barcodeData);
-                            }
-                        }
-                    });
+                    newCodeValue(barcodes.valueAt(0), intent);
                 }
             }
         });
@@ -213,7 +172,6 @@ public class CheckIn extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-        initialiseDetectorsAndSources();
     }
 
     private void checkInBook(int libraryId, int bookId) {
@@ -256,6 +214,77 @@ public class CheckIn extends AppCompatActivity {
         } else {
             resources.updateConfiguration(config, resources.getDisplayMetrics());
         }
+    }
+
+    public void newCodeValue(Barcode barcode, Intent intent) {
+        EditText codeBarEditText = findViewById(R.id.codeBar);
+
+        String currentBarcodeData;
+        if (barcode.email != null) {
+            currentBarcodeData = barcode.email.address;
+        } else {
+            currentBarcodeData = barcode.displayValue;
+        }
+
+        codeBarList.add(currentBarcodeData);
+
+        if (!codeBarList.isEmpty()) {
+            Map<String, Integer> occurrences = new HashMap<>();
+            String mostFrequentValue = currentBarcodeData;
+            int maxCount = 0;
+
+            for (String value : codeBarList) {
+                int count = occurrences.getOrDefault(value, 0) + 1;
+                occurrences.put(value, count);
+
+                if (count > maxCount) {
+                    maxCount = count;
+                    mostFrequentValue = value;
+                    if (maxCount > 20) checkInScanCode(intent);
+                }
+            }
+
+            codeBarEditText.setText(mostFrequentValue);
+        }
+    }
+
+    public void checkInScanCode(Intent intent){
+        EditText scanText = findViewById(R.id.codeBar);
+        String isbn = scanText.getText().toString();
+
+        String libraryName = intent.getStringExtra("library");
+        int libraryId = intent.getIntExtra("libraryId", 0);
+
+        // Call the API to get the book by ISBN
+        Call<Book> getBookCall = apiService.getBookByIsbn(isbn);
+        getBookCall.enqueue(new Callback<Book>() {
+            @Override
+            public void onResponse(Call<Book> call, Response<Book> response) {
+                if (response.isSuccessful()) {
+                    Book book = response.body();
+                    if (book != null) {
+                        int bookId = book.getId();
+
+                        // Call the method to check in the book
+                        checkInBook(libraryId, bookId);
+                        Intent intentCheckIn = new Intent(CheckIn.this, MainActivity.class);
+                        startActivity(intentCheckIn);
+                    }
+                } else {
+                    // Book not found, create a new book
+                    Intent intentNewBook = new Intent(CheckIn.this, NewBook.class);
+                    intentNewBook.putExtra("library", libraryName);
+                    intentNewBook.putExtra("code", isbn);
+                    intentNewBook.putExtra("libraryId", libraryId);
+                    startActivity(intentNewBook);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Book> call, Throwable t) {
+                // Handle the failure (e.g., network error)
+            }
+        });
     }
 
     @Override
