@@ -51,7 +51,13 @@ public class NewBook extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_book);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_new_book_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_new_book);
+        }
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
@@ -232,5 +238,11 @@ public class NewBook extends AppCompatActivity {
         } else {
             resources.updateConfiguration(config, resources.getDisplayMetrics());
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 }

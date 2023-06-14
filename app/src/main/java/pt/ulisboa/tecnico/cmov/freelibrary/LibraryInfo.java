@@ -82,7 +82,13 @@ public class LibraryInfo extends AppCompatActivity
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_library_info);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_library_info_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_library_info);
+        }
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
@@ -155,7 +161,6 @@ public class LibraryInfo extends AppCompatActivity
                     startActivity(intent1);
                 });
             }
-
             @Override
             public void onFetchFailed() {
                 // Handle the fetch failure
@@ -339,4 +344,9 @@ public class LibraryInfo extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
+    }
 }

@@ -54,7 +54,13 @@ public class CheckIn extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_check_in);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_check_in_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_check_in);
+        }
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
@@ -250,5 +256,11 @@ public class CheckIn extends AppCompatActivity {
         } else {
             resources.updateConfiguration(config, resources.getDisplayMetrics());
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 }

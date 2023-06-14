@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import android.widget.ArrayAdapter;
@@ -49,7 +50,13 @@ public class BookInfo extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_info);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_book_info_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_book_info);
+        }
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
@@ -167,5 +174,11 @@ public class BookInfo extends AppCompatActivity {
         } else {
             resources.updateConfiguration(config, resources.getDisplayMetrics());
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 }

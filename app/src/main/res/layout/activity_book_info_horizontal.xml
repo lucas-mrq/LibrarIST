@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BookInfo">
+
+    <include
+        android:id="@+id/include4"
+        layout="@layout/bottom_layout_horizontal" />
+
+    <TextView
+        android:id="@+id/bookTitle"
+        android:layout_width="272dp"
+        android:layout_height="34dp"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        android:text="bookTitle"
+        android:textSize="32dp"
+        android:textStyle="bold"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/bookAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="bookAuthor"
+        app:layout_constraintStart_toEndOf="@+id/textAuthor"
+        app:layout_constraintTop_toTopOf="@+id/textAuthor" />
+
+    <TextView
+        android:id="@+id/textAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/author"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bookTitle" />
+
+    <ImageView
+        android:id="@+id/cover"
+        android:layout_width="172dp"
+        android:layout_height="278dp"
+        android:layout_marginEnd="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bookAuthor"
+        app:srcCompat="@drawable/les_miserables_cover" />
+
+    <TextView
+        android:id="@+id/Availability"
+        android:layout_width="121dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        android:text="@string/availability"
+        android:textSize="15dp"
+        android:textStyle="bold"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintStart_toStartOf="@+id/textAuthor"
+        app:layout_constraintTop_toBottomOf="@+id/textAuthor" />
+
+    <ListView
+        android:id="@+id/listofLibraryWhereBookAvailable"
+        android:layout_width="400dp"
+        android:layout_height="220dp"
+        app:layout_constraintStart_toStartOf="@+id/textAuthor"
+        app:layout_constraintTop_toBottomOf="@+id/Availability" />
+
+    <ImageView
+        android:id="@+id/notifications"
+        android:layout_width="40dp"
+        android:layout_height="41dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/include4"
+        app:layout_constraintTop_toTopOf="@+id/include4"
+        app:srcCompat="@drawable/notifications_off" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
