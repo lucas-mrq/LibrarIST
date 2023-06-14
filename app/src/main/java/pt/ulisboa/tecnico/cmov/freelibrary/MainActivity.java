@@ -19,11 +19,15 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 import android.Manifest.permission;
 import android.Manifest;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -31,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.util.Log;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -53,6 +58,7 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.io.IOException;
 
@@ -109,8 +115,17 @@ public class MainActivity extends AppCompatActivity
         }
 
         super.onCreate(savedInstanceState);
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_main_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_main);
+        }
+
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
 
         //Instantiate ApiService
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -162,24 +177,15 @@ public class MainActivity extends AppCompatActivity
 
         mapFragment.getMapAsync(this);
 
-
-
-
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
-
-        //Define Map Buttons
-        Button mapButton = (Button) findViewById(R.id.mapMenu);
-        mapButton.setOnClickListener(view -> {
-            Intent intentMap = new Intent(MainActivity.this, MainActivity.class);
-            startActivity(intentMap);
-        });
 
         //Define Search Buttons
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(MainActivity.this, SearchActivity.class);
+            intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
 
@@ -266,9 +272,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLibraryClick(boolean isFavorite, String name, String address, int libraryId) {
         Intent intent = new Intent(MainActivity.this, LibraryInfo.class);
-        intent.putExtra("favorite", isFavorite);
         intent.putExtra("name", name);
-        intent.putExtra("address", address);
         intent.putExtra("libraryId", libraryId);
         startActivity(intent);
     }
@@ -355,4 +359,27 @@ public class MainActivity extends AppCompatActivity
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }
 
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
+    }
 }

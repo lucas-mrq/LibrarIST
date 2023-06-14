@@ -7,46 +7,46 @@
     android:layout_height="match_parent"
     tools:context=".CheckIn">
 
-    <include layout="@layout/bottom_layout" />
+    <include
+        android:id="@+id/include5"
+        layout="@layout/bottom_layout_horizontal" />
 
     <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="320dp"
         android:layout_height="240dp"
-        android:layout_marginTop="15dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/libraryBookName" />
+        android:layout_marginStart="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/include5"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/codeBar"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/surface_view" />
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="@+id/libraryBookName"
+        app:layout_constraintTop_toBottomOf="@+id/libraryBookName" />
 
     <TextView
         android:id="@+id/libraryBookName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="15dp"
         android:text="Library"
         android:textSize="34sp"
-        app:layout_constraintEnd_toEndOf="@+id/surface_view"
-        app:layout_constraintStart_toStartOf="@+id/surface_view"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/surface_view"
+        app:layout_constraintTop_toTopOf="@+id/surface_view" />
 
     <Button
         android:id="@+id/checkInRegisterButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="15dp"
         android:text="@string/checkin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/codeBar"
         app:layout_constraintTop_toBottomOf="@+id/codeBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

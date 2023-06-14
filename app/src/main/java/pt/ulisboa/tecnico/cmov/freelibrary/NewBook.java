@@ -2,15 +2,17 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,6 +23,8 @@ import androidx.core.app.ActivityCompat;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -47,7 +51,17 @@ public class NewBook extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_book);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_new_book_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_new_book);
+        }
+
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
 
         //Instantiate ApiService
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -117,7 +131,7 @@ public class NewBook extends AppCompatActivity {
             String bookAuthor = authorField.getText().toString();
             String bookISBN = isbnField.getText().toString();
 
-            createAndCheckinBook(bookTitle, bookAuthor, bookISBN);
+            createAndCheckingBook(bookTitle, bookAuthor, bookISBN);
         });
 
 
@@ -129,6 +143,7 @@ public class NewBook extends AppCompatActivity {
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(NewBook.this, MainActivity.class);
+            intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
         });
 
@@ -136,6 +151,7 @@ public class NewBook extends AppCompatActivity {
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(NewBook.this, SearchActivity.class);
+            intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
     }
@@ -154,7 +170,7 @@ public class NewBook extends AppCompatActivity {
         }
     }
 
-    private void createAndCheckinBook(String bookTitle, String bookAuthor, String bookISBN) {
+    private void createAndCheckingBook(String bookTitle, String bookAuthor, String bookISBN) {
         RequestBody titleBody = RequestBody.create(MediaType.parse("text/plain"), bookTitle);
         RequestBody authorBody = RequestBody.create(MediaType.parse("text/plain"), bookAuthor);
         RequestBody isbnBody = RequestBody.create(MediaType.parse("text/plain"), bookISBN);
@@ -196,6 +212,7 @@ public class NewBook extends AppCompatActivity {
                     Intent intentLibraryInfo = new Intent(NewBook.this, LibraryInfo.class);
                     intentLibraryInfo.putExtra("libraryId", libraryId);
                     startActivity(intentLibraryInfo);
+                    finish();
                 } else {
                     Toast.makeText(getApplicationContext(), "Book checked in failed", Toast.LENGTH_SHORT).show();
                 }
@@ -206,5 +223,29 @@ public class NewBook extends AppCompatActivity {
                 // Handle the failure (e.g., network error)
             }
         });
+    }
+
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 }

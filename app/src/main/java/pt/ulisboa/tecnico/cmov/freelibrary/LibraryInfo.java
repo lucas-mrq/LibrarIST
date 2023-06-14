@@ -5,11 +5,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 
+import android.os.Build;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -29,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,7 +85,17 @@ public class LibraryInfo extends AppCompatActivity
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_library_info);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_library_info_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_library_info);
+        }
+
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
 
         //Instantiate ApiService
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -143,12 +160,10 @@ public class LibraryInfo extends AppCompatActivity
                     intent1.putExtra("id", book.getId());
                     intent1.putExtra("title", book.getTitle());
                     intent1.putExtra("author", book.getAuthor());
-                    intent1.putExtra("language", book.getLanguage());
                     intent1.putExtra("image", book.getImage());
                     startActivity(intent1);
                 });
             }
-
             @Override
             public void onFetchFailed() {
                 // Handle the fetch failure
@@ -175,14 +190,41 @@ public class LibraryInfo extends AppCompatActivity
             startActivity(intentCheckIn);
         });
 
+        //Define check-out button
+        Button checkOutButton = (Button) findViewById(R.id.outButton);
+        checkOutButton.setOnClickListener(view -> {
+            Intent intentCheckIn = new Intent(LibraryInfo.this, CheckIn.class);
+            intentCheckIn.putExtra("library", name);
+            intentCheckIn.putExtra("libraryId", libraryId);
+            startActivity(intentCheckIn);
+        });
+
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
+
+        // Define share button
+        ImageButton shareButton = findViewById(R.id.share);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                String textToShare = name + ": This library is amazing !";
+                shareIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
+                shareIntent.putExtra(Intent.EXTRA_TITLE,"This library is amazing !");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "This library is amazing !"); // the subject of an email
+
+                shareIntent.setType("text/plain");
+                startActivity(Intent.createChooser(shareIntent, null));
+            }
+        });
 
         //Define Map Buttons
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(LibraryInfo.this, MainActivity.class);
+            intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
         });
 
@@ -190,6 +232,7 @@ public class LibraryInfo extends AppCompatActivity
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(LibraryInfo.this, SearchActivity.class);
+            intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
     }
@@ -314,4 +357,27 @@ public class LibraryInfo extends AppCompatActivity
         return null;
     }
 
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
+    }
 }

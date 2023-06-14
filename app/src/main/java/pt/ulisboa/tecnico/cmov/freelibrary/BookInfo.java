@@ -1,14 +1,22 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.Build;
+
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -16,12 +24,15 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
 
@@ -32,7 +43,7 @@ import retrofit2.Response;
 public class BookInfo extends AppCompatActivity {
 
     private ApiService apiService;
-
+    private List<Library> allLibraries = new ArrayList<>();
     private boolean activeNotifications = false;
 
     @Override
@@ -45,7 +56,17 @@ public class BookInfo extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_info);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_book_info_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_book_info);
+        }
+
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
 
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
@@ -54,17 +75,14 @@ public class BookInfo extends AppCompatActivity {
         int bookId = intent.getIntExtra("id", 0);
         String title = intent.getStringExtra("title");
         String author = intent.getStringExtra("author");
-        String language = intent.getStringExtra("language");
         int image = intent.getIntExtra("image", R.drawable.fables_cover);
 
         TextView titleText = (TextView) findViewById(R.id.bookTitle);
         TextView authorText = (TextView) findViewById(R.id.bookAuthor);
-        TextView languageText = (TextView) findViewById(R.id.bookLanguage);
         ImageView coverImage = (ImageView) findViewById((R.id.cover));
 
         titleText.setText(title);
         authorText.setText(author);
-        languageText.setText(language);
         coverImage.setImageResource(image);
 
         // Define available libraries
@@ -82,7 +100,23 @@ public class BookInfo extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
                 if(response.isSuccessful() && response.body() != null) {
-                    List<Library> libraries = response.body();
+
+                    List<Library> multipleLibraries = response.body();
+                    List<Library> libraries = new ArrayList<>();
+
+                    for (Library library : multipleLibraries) {
+                        boolean libraryExists = false;
+                        for (Library uniqueLibrary : libraries) {
+                            if (uniqueLibrary.getName().equals(library.getName())) {
+                                libraryExists = true;
+                                break;
+                            }
+                        }
+                        if (!libraryExists) {
+                            libraries.add(library);
+                        }
+                    }
+
                     List<Library> favoriteLibraries = new ArrayList<>();
                     List<Library> otherLibraries = new ArrayList<>();
                     for (Library library : libraries) {
@@ -92,8 +126,13 @@ public class BookInfo extends AppCompatActivity {
                             otherLibraries.add(library);
                         }
                     }
+
+                    allLibraries.addAll(favoriteLibraries);
+                    allLibraries.addAll(otherLibraries);
+
                     for (Library library : favoriteLibraries) {
-                        availabilityList.add(HtmlCompat.fromHtml("<b>" + library.getName() + "</b>", HtmlCompat.FROM_HTML_MODE_LEGACY).toString());
+                        String favoriteLibrary = "☆ " + library.getName() + " ☆";
+                        availabilityList.add(favoriteLibrary);
                     }
                     for (Library library : otherLibraries) {
                         availabilityList.add(library.getName());
@@ -111,7 +150,15 @@ public class BookInfo extends AppCompatActivity {
             }
         });
 
-        ImageView notificationIcon = findViewById(R.id.notifications);
+        availabilityListView.setOnItemClickListener((adapterView, view, position, id) -> {
+            Library library = allLibraries.get(position);
+            Intent intentLibrary = new Intent(BookInfo.this, LibraryInfo.class);
+            intentLibrary.putExtra("name", library.getName());
+            intentLibrary.putExtra("libraryId", library.getId());
+            startActivity(intentLibrary);
+        });
+
+        ImageButton notificationIcon = findViewById(R.id.notifications);
         notificationIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,7 +174,40 @@ public class BookInfo extends AppCompatActivity {
             }
         });
 
-        //Define Theme Button
+        ImageButton shareButton = findViewById(R.id.share);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                String textToShare = "You have to read " + title + " !";
+                shareIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
+                shareIntent.putExtra(Intent.EXTRA_TITLE,"You have to read this book !");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "You have to read this book !"); // the subject of an email
+
+                // (Optional) Here you're passing a content URI to an image to be displayed
+                //shareIntent.setData(uri);
+                //shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                // Show the Sharesheet
+                shareIntent.setType("text/plain");
+                startActivity(Intent.createChooser(shareIntent, null));
+
+                /* Try to shar just an image
+                Context context = BookInfo.this;
+                int imageResourceId = context.getResources().getIdentifier("free_library_example", "drawable", context.getPackageName());
+                Uri uri = Uri.parse("android.resource://" + context.getPackageName() + "/" + imageResourceId);
+                if (uri != null) {
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    shareIntent.setType("image/*");
+                    startActivity(Intent.createChooser(shareIntent, null));
+                }
+                else {
+                    Log.e("BookInfo", "Failed to create URI for the image resource");
+                }*/
+            }
+        });
+
+            //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
 
@@ -135,6 +215,7 @@ public class BookInfo extends AppCompatActivity {
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(BookInfo.this, MainActivity.class);
+            intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
         });
 
@@ -142,7 +223,32 @@ public class BookInfo extends AppCompatActivity {
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(BookInfo.this, SearchActivity.class);
+            intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
+    }
+
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        recreate();
     }
 }
