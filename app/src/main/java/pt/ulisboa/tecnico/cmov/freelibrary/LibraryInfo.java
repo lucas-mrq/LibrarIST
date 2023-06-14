@@ -224,16 +224,16 @@ public class LibraryInfo extends AppCompatActivity
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(LibraryInfo.this, MainActivity.class);
+            intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
-            finish();
         });
 
         //Define Search Buttons
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(LibraryInfo.this, SearchActivity.class);
+            intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
-            finish();
         });
     }
 

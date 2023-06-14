@@ -148,8 +148,8 @@ public class SearchActivity extends AppCompatActivity {
         Button mapButton = (Button) findViewById(R.id.mapMenu);
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(SearchActivity.this, MainActivity.class);
+            intentMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentMap);
-            finish();
         });
     }
 
