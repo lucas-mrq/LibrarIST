@@ -181,18 +181,12 @@ public class MainActivity extends AppCompatActivity
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
 
-        //Define Map Buttons
-        Button mapButton = (Button) findViewById(R.id.mapMenu);
-        mapButton.setOnClickListener(view -> {
-            Intent intentMap = new Intent(MainActivity.this, MainActivity.class);
-            startActivity(intentMap);
-        });
-
         //Define Search Buttons
         Button searchButton = (Button) findViewById(R.id.searchMenu);
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(intentSearch);
+            finish();
         });
     }
 

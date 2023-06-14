@@ -216,6 +216,7 @@ public class LibraryInfo extends AppCompatActivity
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(LibraryInfo.this, MainActivity.class);
             startActivity(intentMap);
+            finish();
         });
 
         //Define Search Buttons
@@ -223,6 +224,7 @@ public class LibraryInfo extends AppCompatActivity
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(LibraryInfo.this, SearchActivity.class);
             startActivity(intentSearch);
+            finish();
         });
     }
 

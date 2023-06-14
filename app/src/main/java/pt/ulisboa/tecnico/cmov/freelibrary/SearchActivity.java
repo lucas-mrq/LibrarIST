@@ -149,13 +149,7 @@ public class SearchActivity extends AppCompatActivity {
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(SearchActivity.this, MainActivity.class);
             startActivity(intentMap);
-        });
-
-        //Define Search Buttons
-        Button searchButton = (Button) findViewById(R.id.searchMenu);
-        searchButton.setOnClickListener(view -> {
-            Intent intentSearch = new Intent(SearchActivity.this, SearchActivity.class);
-            startActivity(intentSearch);
+            finish();
         });
     }
 

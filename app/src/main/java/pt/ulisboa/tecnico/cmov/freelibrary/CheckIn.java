@@ -94,6 +94,7 @@ public class CheckIn extends AppCompatActivity {
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(CheckIn.this, MainActivity.class);
             startActivity(intentMap);
+            finish();
         });
 
         //Define Search Buttons
@@ -101,6 +102,7 @@ public class CheckIn extends AppCompatActivity {
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(CheckIn.this, SearchActivity.class);
             startActivity(intentSearch);
+            finish();
         });
     }
 
@@ -186,6 +188,7 @@ public class CheckIn extends AppCompatActivity {
                     Intent intentLibraryInfo = new Intent(CheckIn.this, LibraryInfo.class);
                     intentLibraryInfo.putExtra("libraryId", libraryId);
                     startActivity(intentLibraryInfo);
+                    finish();
                 } else {
                     Toast.makeText(getApplicationContext(), "Book checked in failed", Toast.LENGTH_SHORT).show();
                 }
@@ -269,6 +272,7 @@ public class CheckIn extends AppCompatActivity {
                         checkInBook(libraryId, bookId);
                         Intent intentCheckIn = new Intent(CheckIn.this, MainActivity.class);
                         startActivity(intentCheckIn);
+                        finish();
                     }
                 } else {
                     // Book not found, create a new book
@@ -277,6 +281,7 @@ public class CheckIn extends AppCompatActivity {
                     intentNewBook.putExtra("code", isbn);
                     intentNewBook.putExtra("libraryId", libraryId);
                     startActivity(intentNewBook);
+                    finish();
                 }
             }
 

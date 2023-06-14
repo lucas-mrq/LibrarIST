@@ -185,6 +185,7 @@ public class BookInfo extends AppCompatActivity {
         mapButton.setOnClickListener(view -> {
             Intent intentMap = new Intent(BookInfo.this, MainActivity.class);
             startActivity(intentMap);
+            finish();
         });
 
         //Define Search Buttons
@@ -192,6 +193,7 @@ public class BookInfo extends AppCompatActivity {
         searchButton.setOnClickListener(view -> {
             Intent intentSearch = new Intent(BookInfo.this, SearchActivity.class);
             startActivity(intentSearch);
+            finish();
         });
     }
 
