@@ -24,18 +24,17 @@
         android:id="@+id/codeBar"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/checkInRegisterButton"
-        app:layout_constraintEnd_toEndOf="@+id/include5"
-        app:layout_constraintStart_toEndOf="@+id/surface_view"
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="@+id/libraryBookName"
         app:layout_constraintTop_toBottomOf="@+id/libraryBookName" />
 
     <TextView
         android:id="@+id/libraryBookName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="50dp"
         android:text="Library"
-        app:layout_constraintEnd_toEndOf="@+id/include5"
+        android:textSize="34sp"
         app:layout_constraintStart_toEndOf="@+id/surface_view"
         app:layout_constraintTop_toTopOf="@+id/surface_view" />
 
@@ -43,9 +42,9 @@
         android:id="@+id/checkInRegisterButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:text="@string/checkin"
-        app:layout_constraintBottom_toBottomOf="@+id/surface_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/surface_view" />
+        app:layout_constraintStart_toStartOf="@+id/codeBar"
+        app:layout_constraintTop_toBottomOf="@+id/codeBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
