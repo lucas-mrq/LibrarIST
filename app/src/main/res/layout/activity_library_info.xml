@@ -9,8 +9,8 @@
     <include
         android:id="@+id/include2"
         layout="@layout/bottom_layout"
-        tools:layout_editor_absoluteX="188dp"
-        tools:layout_editor_absoluteY="103dp" />
+        tools:layout_editor_absoluteX="-167dp"
+        tools:layout_editor_absoluteY="67dp" />
 
     <ListView
         android:id="@+id/listBooks"
@@ -108,14 +108,16 @@
         app:layout_constraintStart_toStartOf="@+id/map"
         app:layout_constraintTop_toTopOf="@+id/map" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/libraryName"
+        android:layout_width="40dp"
+        android:layout_height="41dp"
+        android:layout_marginEnd="15dp"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="@+id/favoriteButton"
         app:layout_constraintEnd_toStartOf="@+id/favoriteButton"
-        app:layout_constraintStart_toEndOf="@+id/libraryName"
-        app:layout_constraintTop_toTopOf="@+id/libraryName"
+        app:layout_constraintTop_toTopOf="@+id/favoriteButton"
         app:srcCompat="@drawable/share" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

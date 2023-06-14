@@ -87,4 +87,15 @@
         app:layout_constraintTop_toTopOf="@+id/bookTitle"
         app:srcCompat="@drawable/notifications_off" />
 
+    <ImageButton
+        android:id="@+id/share"
+        android:layout_width="40dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="@+id/notifications"
+        app:layout_constraintTop_toBottomOf="@+id/notifications"
+        app:srcCompat="@drawable/share" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
