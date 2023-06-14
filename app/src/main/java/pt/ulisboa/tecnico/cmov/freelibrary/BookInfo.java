@@ -136,7 +136,8 @@ public class BookInfo extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, title);
+                String textToShare = "You have to read " + title + " !";
+                shareIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
                 shareIntent.putExtra(Intent.EXTRA_TITLE,"You have to read this book !");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "You have to read this book !"); // the subject of an email
 
