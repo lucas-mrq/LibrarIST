@@ -155,7 +155,6 @@ public class NewBook extends AppCompatActivity {
     }
 
     private void createAndCheckinBook(String bookTitle, String bookAuthor, String bookISBN) {
-        bookISBN = "99912345";
         RequestBody titleBody = RequestBody.create(MediaType.parse("text/plain"), bookTitle);
         RequestBody authorBody = RequestBody.create(MediaType.parse("text/plain"), bookAuthor);
         RequestBody isbnBody = RequestBody.create(MediaType.parse("text/plain"), bookISBN);
