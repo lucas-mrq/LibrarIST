@@ -11,8 +11,10 @@ import android.location.Address;
 import android.location.Geocoder;
 
 import android.os.Build;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -185,6 +187,23 @@ public class LibraryInfo extends AppCompatActivity
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);
+
+        // Define share button
+        ImageView shareButton = findViewById(R.id.share);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                String textToShare = name + ": This library is amazing !";
+                shareIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
+                shareIntent.putExtra(Intent.EXTRA_TITLE,"This library is amazing !");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "This library is amazing !"); // the subject of an email
+
+                shareIntent.setType("text/plain");
+                startActivity(Intent.createChooser(shareIntent, null));
+            }
+        });
 
         //Define Map Buttons
         Button mapButton = (Button) findViewById(R.id.mapMenu);
