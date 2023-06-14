@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 
+import android.os.Build;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -29,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -79,6 +83,10 @@ public class LibraryInfo extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_info);
+
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
 
         //Instantiate ApiService
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -143,7 +151,6 @@ public class LibraryInfo extends AppCompatActivity
                     intent1.putExtra("id", book.getId());
                     intent1.putExtra("title", book.getTitle());
                     intent1.putExtra("author", book.getAuthor());
-                    intent1.putExtra("language", book.getLanguage());
                     intent1.putExtra("image", book.getImage());
                     startActivity(intent1);
                 });
@@ -312,6 +319,24 @@ public class LibraryInfo extends AppCompatActivity
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
     }
 
 }

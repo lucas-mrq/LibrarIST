@@ -36,26 +36,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="25dp"
-        android:text="Author: "
+        android:text="@string/author"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bookTitle" />
-
-    <TextView
-        android:id="@+id/bookLanguage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="bookLanguage"
-        app:layout_constraintStart_toEndOf="@+id/textLanguage"
-        app:layout_constraintTop_toTopOf="@+id/textLanguage" />
-
-    <TextView
-        android:id="@+id/textLanguage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Language: "
-        app:layout_constraintStart_toStartOf="@+id/textAuthor"
-        app:layout_constraintTop_toBottomOf="@+id/textAuthor" />
 
     <ImageView
         android:id="@+id/cover"
@@ -71,7 +54,7 @@
         android:layout_width="121dp"
         android:layout_height="35dp"
         android:gravity="center"
-        android:text="Availability:"
+        android:text="@string/availability"
         android:textSize="24dp"
         android:textStyle="bold"
         app:autoSizeTextType="uniform"

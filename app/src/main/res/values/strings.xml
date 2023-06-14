@@ -1,7 +1,19 @@
 <resources>
     <string name="app_name">FreeLibrary</string>
-    <string name="search">Search</string>
+    <string name="search">Books</string>
     <string name="map">Map</string>
     <string name="permission_required_toast">Permission required toast.</string>
-
+    <string name="search_hint">Search address</string>
+    <string name="author">Author: </string>
+    <string name="availability">Availability: </string>
+    <string name="checkin">Check-In</string>
+    <string name="checkout">Check-Out</string>
+    <string name="library">Library: </string>
+    <string name="title">Title: </string>
+    <string name="barcode">Code Bar:</string>
+    <string name="selectpicture">Please select book picture:</string>
+    <string name="fromcamera">from Camera</string>
+    <string name="fromfile">from File</string>
+    <string name="register">Register new Book</string>
+    <string name="booksearch">Search Book</string>
 </resources>

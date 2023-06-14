@@ -23,7 +23,7 @@
             android:layout_marginTop="7dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/search_bar"
-            android:queryHint="Search address" />
+            android:queryHint="@string/search_hint" />
 
         <include layout="@layout/bottom_layout" />
 

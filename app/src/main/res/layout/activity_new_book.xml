@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="30dp"
-        android:text="Library: "
+        android:text="@string/library"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bookName" />
 
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:text="libraryBook"
+        android:text=""
         app:layout_constraintStart_toEndOf="@+id/bookLibrary"
         app:layout_constraintTop_toTopOf="@+id/bookLibrary" />
 
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="30dp"
-        android:text="Title:"
+        android:text="@string/title"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="30dp"
-        android:text="Author: "
+        android:text="@string/author"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bookLibrary" />
 
@@ -78,7 +78,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="Code Bar: "
+        android:text="@string/barcode"
         app:layout_constraintStart_toStartOf="@+id/authorLibrary"
         app:layout_constraintTop_toBottomOf="@+id/authorLibrary" />
 
@@ -101,7 +101,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="30dp"
-        android:text="Please select book picture:"
+        android:text="@string/selectpicture"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/codeLibrary" />
 
@@ -110,7 +110,7 @@
         android:layout_width="100dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
-        android:text="from Camera"
+        android:text="@string/fromcamera"
         android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="@+id/photoLibrary"
         app:layout_constraintStart_toEndOf="@+id/photoLibrary"
@@ -144,7 +144,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="Register new Book"
+        android:text="@string/register"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bookImage" />

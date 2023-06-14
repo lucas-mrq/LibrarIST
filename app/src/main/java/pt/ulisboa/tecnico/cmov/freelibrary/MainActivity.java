@@ -22,8 +22,11 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -53,6 +56,7 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.io.IOException;
 
@@ -112,13 +116,15 @@ public class MainActivity extends AppCompatActivity
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
+
         //Instantiate ApiService
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
         // Define search location bar
          searchLocation = findViewById(R.id.searchLocation);
-
-
 
         //Define the Map in background
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -163,9 +169,6 @@ public class MainActivity extends AppCompatActivity
         });
 
         mapFragment.getMapAsync(this);
-
-
-
 
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
@@ -349,4 +352,21 @@ public class MainActivity extends AppCompatActivity
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }
 
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
+    }
 }
