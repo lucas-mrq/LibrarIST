@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
 
@@ -98,7 +99,22 @@ public class BookInfo extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
                 if(response.isSuccessful() && response.body() != null) {
-                    List<Library> libraries = response.body();
+
+                    List<Library> multipleLibraries = response.body();
+                    List<Library> libraries = new ArrayList<>();
+
+                    for (Library library : multipleLibraries) {
+                        boolean libraryExists = false;
+                        for (Library uniqueLibrary : libraries) {
+                            if (uniqueLibrary.getName().equals(library.getName())) {
+                                libraryExists = true;
+                                break;
+                            }
+                        }
+                        if (!libraryExists) {
+                            libraries.add(library);
+                        }
+                    }
                     List<Library> favoriteLibraries = new ArrayList<>();
                     List<Library> otherLibraries = new ArrayList<>();
                     for (Library library : libraries) {

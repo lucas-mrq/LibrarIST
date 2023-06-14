@@ -169,7 +169,19 @@ public class SearchActivity extends AppCompatActivity {
                             public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
                                 if (response.isSuccessful()) {
                                     List<Book> libraryBooks = response.body();
-                                    bookList.addAll(libraryBooks);
+                                    for (Book book : libraryBooks) {
+                                        boolean bookExists = false;
+                                        for (Book existingBook : bookList) {
+                                            if (existingBook.getTitle().equals(book.getTitle())) {
+                                                bookExists = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!bookExists) {
+                                            bookList.add(book);
+                                        }
+                                    }
+
                                 }
 
                                 int count = fetchedCount.incrementAndGet();
