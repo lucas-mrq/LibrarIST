@@ -43,6 +43,9 @@
             android:name=".NewBook"
             android:exported="false" />
         <activity
+            android:name=".NewLibrary"
+            android:exported="false" />
+        <activity
             android:name=".LibraryInfo"
             android:exported="false" />
         <activity

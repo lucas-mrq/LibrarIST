@@ -118,8 +118,6 @@ public class MainActivity extends AppCompatActivity
         // Define search location bar
          searchLocation = findViewById(R.id.searchLocation);
 
-
-
         //Define the Map in background
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
@@ -184,6 +182,14 @@ public class MainActivity extends AppCompatActivity
             Intent intentSearch = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(intentSearch);
         });
+
+        // Define Add a new library button
+        Button addLibraryButton = (Button) findViewById(R.id.newLibrary);
+        addLibraryButton.setOnClickListener(view -> {
+            Intent intentNewLibrary = new Intent(MainActivity.this, NewLibrary.class);
+            startActivity(intentNewLibrary);
+        });
+
     }
 
     /**
