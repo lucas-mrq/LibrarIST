@@ -125,7 +125,8 @@ public class BookInfo extends AppCompatActivity {
                         }
                     }
                     for (Library library : favoriteLibraries) {
-                        availabilityList.add(HtmlCompat.fromHtml("<b>" + library.getName() + "</b>", HtmlCompat.FROM_HTML_MODE_LEGACY).toString());
+                        String favoriteLibrary = "☆ " + library.getName() + " ☆";
+                        availabilityList.add(favoriteLibrary);
                     }
                     for (Library library : otherLibraries) {
                         availabilityList.add(library.getName());
