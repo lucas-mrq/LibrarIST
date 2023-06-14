@@ -1,6 +1,9 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.text.TextUtils;
@@ -15,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -49,6 +53,10 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
+
         bookList = new ArrayList<>();
 
         //Define the book list
@@ -59,7 +67,6 @@ public class SearchActivity extends AppCompatActivity {
             intent.putExtra("id", book.getId());
             intent.putExtra("title", book.getTitle());
             intent.putExtra("author", book.getAuthor());
-            intent.putExtra("language", book.getLanguage());
             startActivity(intent);
         });
 
@@ -217,4 +224,21 @@ public class SearchActivity extends AppCompatActivity {
         return score;
     }
 
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
+    }
 }

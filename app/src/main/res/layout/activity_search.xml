@@ -17,7 +17,7 @@
         android:layout_marginTop="15dp"
         android:background="@drawable/search_bar"
         android:iconifiedByDefault="false"
-        android:queryHint="Search"
+        android:queryHint="@string/booksearch"
         app:layout_constraintEnd_toEndOf="@+id/listBooks"
         app:layout_constraintStart_toStartOf="@+id/listBooks"
         app:layout_constraintTop_toTopOf="@+id/include3" />

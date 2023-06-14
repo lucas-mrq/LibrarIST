@@ -1,6 +1,9 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.Manifest;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.Build;
 import android.util.SparseArray;
 import android.os.Bundle;
 
@@ -24,6 +27,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
@@ -51,6 +55,10 @@ public class CheckIn extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_in);
+
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
 
         //Define Library Name
         Intent intent = getIntent();
@@ -224,5 +232,23 @@ public class CheckIn extends AppCompatActivity {
                 // Handle the failure (e.g., network error)
             }
         });
+    }
+
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
     }
 }

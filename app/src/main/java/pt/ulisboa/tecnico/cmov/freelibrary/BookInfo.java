@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.Build;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +27,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
@@ -51,6 +56,10 @@ public class BookInfo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_info);
 
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+        setLocale(language);
+
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
         //Get & set book information's
@@ -58,17 +67,14 @@ public class BookInfo extends AppCompatActivity {
         int bookId = intent.getIntExtra("id", 0);
         String title = intent.getStringExtra("title");
         String author = intent.getStringExtra("author");
-        String language = intent.getStringExtra("language");
         int image = intent.getIntExtra("image", R.drawable.fables_cover);
 
         TextView titleText = (TextView) findViewById(R.id.bookTitle);
         TextView authorText = (TextView) findViewById(R.id.bookAuthor);
-        TextView languageText = (TextView) findViewById(R.id.bookLanguage);
         ImageView coverImage = (ImageView) findViewById((R.id.cover));
 
         titleText.setText(title);
         authorText.setText(author);
-        languageText.setText(language);
         coverImage.setImageResource(image);
 
         // Define available libraries
@@ -181,5 +187,23 @@ public class BookInfo extends AppCompatActivity {
             Intent intentSearch = new Intent(BookInfo.this, SearchActivity.class);
             startActivity(intentSearch);
         });
+    }
+
+    public void setLocale(String language) {
+        Locale locale = new Locale(language);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getApplicationContext().createConfigurationContext(config);
+        } else {
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+        }
     }
 }
