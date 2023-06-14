@@ -187,14 +187,19 @@ public class LibraryInfo extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
+                Double latitude = libraryLocation.latitude;
+                Double longitude = libraryLocation.longitude;
+
+                String uri = "http://maps.google.com/maps?saddr=" +latitude+","+longitude;
+
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                String textToShare = name + ": This library is amazing !";
+                String textToShare = name + ": This library is amazing ! \n" + uri;
                 shareIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
                 shareIntent.putExtra(Intent.EXTRA_TITLE,"This library is amazing !");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "This library is amazing !"); // the subject of an email
 
                 shareIntent.setType("text/plain");
-                startActivity(Intent.createChooser(shareIntent, null));
+                startActivity(Intent.createChooser(shareIntent, "Share via"));
             }
         });
 

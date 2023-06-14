@@ -14,7 +14,6 @@ public class Book {
         this.id = id;
         this.title = title;
         this.author = author;
-        this.language = language;
         this.coverId = coverId;
     }
 
