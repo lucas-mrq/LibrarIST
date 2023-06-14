@@ -71,14 +71,15 @@
         app:layout_constraintStart_toStartOf="@+id/Availability"
         app:layout_constraintTop_toBottomOf="@+id/Availability" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/notifications"
         android:layout_width="40dp"
         android:layout_height="41dp"
         android:layout_marginTop="15dp"
-        app:layout_constraintStart_toStartOf="@+id/textLanguage"
-        app:layout_constraintTop_toBottomOf="@+id/textLanguage"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="@+id/textAuthor"
+        app:layout_constraintTop_toBottomOf="@+id/textAuthor"
         app:srcCompat="@drawable/notifications_off" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

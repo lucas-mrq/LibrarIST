@@ -75,15 +75,16 @@
         app:layout_constraintStart_toStartOf="@+id/textAuthor"
         app:layout_constraintTop_toBottomOf="@+id/Availability" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/notifications"
         android:layout_width="40dp"
         android:layout_height="41dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="15dp"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="@+id/bookTitle"
         app:layout_constraintEnd_toStartOf="@+id/cover"
-        app:layout_constraintTop_toTopOf="@+id/include4"
+        app:layout_constraintTop_toTopOf="@+id/bookTitle"
         app:srcCompat="@drawable/notifications_off" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
