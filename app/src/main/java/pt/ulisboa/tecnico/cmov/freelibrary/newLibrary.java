@@ -6,15 +6,25 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.ActionMenuItemView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -24,9 +34,14 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
@@ -42,9 +57,19 @@ public class NewLibrary extends AppCompatActivity implements
     private GoogleMap mGoogleMap;
     private SearchView searchLocation;
     private SupportMapFragment mapFragment;
-    private ApiService apiService;
     private Marker searchMarker;
-    private List<Library> libraries;
+    private Marker newLocationMarker;
+    private TextView libraryLocationText;
+
+    // Create a DecimalFormat object with the desired pattern
+    DecimalFormat decimalFormat = new DecimalFormat("#.########");
+
+    FusedLocationProviderClient fusedLocationClient;
+    private LatLng currentLocation;
+    private CheckBox markerCheckBox;
+    private CheckBox currentLocationCheckbox;
+
+    private LatLng newLibraryLocation;
 
 
     @Override
@@ -77,6 +102,82 @@ public class NewLibrary extends AppCompatActivity implements
             startActivity(intentSearch);
         });
 
+        //Define edit Location Button
+        libraryLocationText = (TextView) findViewById(R.id.libraryLocationText);
+
+
+        // Define CheckBoxes
+        markerCheckBox = findViewById(R.id.checkBoxMarker);
+        currentLocationCheckbox = findViewById(R.id.checkBoxCurrentLocation);
+        markerCheckBox.setEnabled(false);
+
+        markerCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    currentLocationCheckbox.setChecked(false);
+                    if (newLocationMarker != null) {
+                        String formattedLatitude = decimalFormat.format(newLocationMarker.getPosition().latitude);
+                        String formattedLongitude = decimalFormat.format(newLocationMarker.getPosition().longitude);
+                        String newLocation = "Lat: " + formattedLatitude + ", Long: " + formattedLongitude;
+
+                        libraryLocationText.setText(newLocation);
+                        newLibraryLocation = newLocationMarker.getPosition();
+                    }
+
+                } else {
+                    currentLocationCheckbox.setChecked(true);
+                }
+            }
+        });
+
+        currentLocationCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    markerCheckBox.setChecked(false);
+                    // Check for location permissions
+                    if (ContextCompat.checkSelfPermission(NewLibrary.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                            ContextCompat.checkSelfPermission(NewLibrary.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                        // Create a FusedLocationProviderClient
+                        fusedLocationClient = LocationServices.getFusedLocationProviderClient(NewLibrary.this);
+
+                        // Request location updates
+                        fusedLocationClient.getLastLocation()
+                                .addOnSuccessListener(NewLibrary.this, new OnSuccessListener<Location>() {
+                                    @Override
+                                    public void onSuccess(Location location) {
+                                        if (location != null) {
+                                            // Location found, you can access the latitude and longitude
+                                            currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+                                            String formattedLatitude = decimalFormat.format(currentLocation.latitude);
+                                            String formattedLongitude = decimalFormat.format(currentLocation.longitude);
+                                            String newLocation = "Lat: " + formattedLatitude + ", Long: " + formattedLongitude;
+
+                                            libraryLocationText.setText(newLocation);
+                                            newLibraryLocation = currentLocation;
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(NewLibrary.this, new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // Failed to get location, handle the error
+                                    }
+                                });
+                    }
+
+
+                }
+                else {
+                    markerCheckBox.setChecked(true);
+                }
+            }
+        });
+
+
         //Define the Map in background
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
@@ -90,7 +191,7 @@ public class NewLibrary extends AppCompatActivity implements
                 String location = searchLocation.getQuery().toString();
                 List<Address> addressList = null;
 
-                if (location!= null || !location.equals("")) {
+                if (location != null || !location.equals("")) {
                     Geocoder geocoder = new Geocoder(NewLibrary.this);
                     try {
                         addressList = geocoder.getFromLocationName(location, 1);
@@ -137,11 +238,86 @@ public class NewLibrary extends AppCompatActivity implements
             mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.lightmap));
         }
         enableMyLocation();
+
+        // Check for location permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            // Create a FusedLocationProviderClient
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+            // Request location updates
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                // Location found, you can access the latitude and longitude
+                                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,15));
+                            }
+                        }
+                    })
+                    .addOnFailureListener(this, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Failed to get location, handle the error
+                        }
+                    });
+        }
+
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                mGoogleMap.clear();
+                newLocationMarker = mGoogleMap.addMarker(new MarkerOptions().position(point).draggable(true));
+                markerCheckBox.setEnabled(true);
+
+                LatLng newPosition = newLocationMarker.getPosition();
+
+                // Format the latitude and longitude values
+                String formattedLatitude = decimalFormat.format(newPosition.latitude);
+                String formattedLongitude = decimalFormat.format(newPosition.longitude);
+                String newLocation = "Lat: " + formattedLatitude + ", Long: " + formattedLongitude;
+
+                markerCheckBox.setChecked(true);
+                libraryLocationText.setText(newLocation);
+                newLibraryLocation = newPosition;
+            }
+        });
+
+        // Set the OnMarkerDragListener
+        mGoogleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(@NonNull Marker marker) {
+
+            }
+            @Override
+            public void onMarkerDrag(Marker marker) {
+                // Called repeatedly while the marker is being dragged
+                // Update the text as the marker is dragged
+                LatLng newPosition = newLocationMarker.getPosition();
+
+                // Format the latitude and longitude values
+                String formattedLatitude = decimalFormat.format(newPosition.latitude);
+                String formattedLongitude = decimalFormat.format(newPosition.longitude);
+                String newLocation = "Lat: " + formattedLatitude + ", Long: " + formattedLongitude;
+                if (markerCheckBox.isChecked()) {
+                    libraryLocationText.setText(newLocation);
+                    newLibraryLocation = newPosition;
+                }
+            }
+
+            @Override
+            public void onMarkerDragEnd(@NonNull Marker marker) {
+            }
+        });
+
     }
+
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        
         return true;
     }
 
@@ -165,4 +341,3 @@ public class NewLibrary extends AppCompatActivity implements
         // [END maps_check_location_permission]
     }
 }
-

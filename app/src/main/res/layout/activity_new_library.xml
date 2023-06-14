@@ -9,7 +9,20 @@
 
     <include
         android:id="@+id/include"
-        layout="@layout/bottom_layout" />
+        layout="@layout/bottom_layout"
+        tools:layout_editor_absoluteX="-58dp"
+        tools:layout_editor_absoluteY="108dp" />
+
+    <TextView
+        android:id="@+id/libraryLocationText"
+        android:layout_width="288dp"
+        android:layout_height="19dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text=""
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/locationText"
+        app:layout_constraintTop_toTopOf="@+id/locationText" />
 
     <TextView
         android:id="@+id/locationLibrary"
@@ -17,7 +30,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="20dp"
-        android:text="Please select location of the library:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/libraryName" />
 
@@ -55,13 +67,13 @@
         app:layout_constraintTop_toBottomOf="@+id/map" />
 
     <TextView
-        android:id="@+id/libraryLocationText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/locationText"
+        android:layout_width="66dp"
+        android:layout_height="20dp"
         android:ems="10"
         android:inputType="text"
-        android:textSize="14sp"
         android:text="Location:"
+        android:textSize="14sp"
         app:layout_constraintStart_toStartOf="@+id/locationLibrary"
         app:layout_constraintTop_toBottomOf="@+id/locationLibrary" />
 
@@ -72,8 +84,9 @@
         android:layout_height="209dp"
         android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.217"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/libraryLocationText" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxCurrentLocation" />
 
     <SearchView
         android:id="@+id/searchLocation"
@@ -110,8 +123,8 @@
 
     <ImageView
         android:id="@+id/libraryImage"
-        android:layout_width="356dp"
-        android:layout_height="177dp"
+        android:layout_width="357dp"
+        android:layout_height="161dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
@@ -125,11 +138,28 @@
         android:id="@+id/registerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="45dp"
+        android:layout_marginBottom="50dp"
         android:text="Register new Library"
         app:layout_constraintBottom_toBottomOf="@+id/include"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/libraryImage" />
+
+    <CheckBox
+        android:id="@+id/checkBoxCurrentLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Use current location"
+        app:layout_constraintStart_toStartOf="@+id/locationText"
+        app:layout_constraintTop_toBottomOf="@+id/locationText" />
+
+    <CheckBox
+        android:id="@+id/checkBoxMarker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="Use marker"
+        app:layout_constraintStart_toEndOf="@+id/checkBoxCurrentLocation"
+        app:layout_constraintTop_toTopOf="@+id/checkBoxCurrentLocation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
