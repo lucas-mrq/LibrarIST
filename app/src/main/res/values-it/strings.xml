@@ -16,4 +16,5 @@
     <string name="fromfile">dal File</string>
     <string name="register">Registra nuovo libro</string>
     <string name="booksearch">Cerca libro</string>
+    <string name="unknown">Libro sconosciuto</string>
 </resources>

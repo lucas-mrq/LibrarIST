@@ -190,6 +190,15 @@ public class LibraryInfo extends AppCompatActivity
             startActivity(intentCheckIn);
         });
 
+        //Define check-out button
+        Button checkOutButton = (Button) findViewById(R.id.outButton);
+        checkOutButton.setOnClickListener(view -> {
+            Intent intentCheckIn = new Intent(LibraryInfo.this, CheckIn.class);
+            intentCheckIn.putExtra("library", name);
+            intentCheckIn.putExtra("libraryId", libraryId);
+            startActivity(intentCheckIn);
+        });
+
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
         ThemeManager.setThemeButton(themeButton);

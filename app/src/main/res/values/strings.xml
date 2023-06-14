@@ -16,4 +16,5 @@
     <string name="fromfile">from File</string>
     <string name="register">Register new Book</string>
     <string name="booksearch">Search Book</string>
+    <string name="unknown">Unknown Book</string>
 </resources>

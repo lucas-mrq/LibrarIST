@@ -16,4 +16,5 @@
     <string name="fromfile">Depuis le Téléphone</string>
     <string name="register">Enregistrer le livre</string>
     <string name="booksearch">Rechercher un livre</string>
+    <string name="unknown">Livre inconnu</string>
 </resources>
