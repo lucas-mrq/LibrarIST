@@ -8,19 +8,18 @@
     tools:context=".NewLibrary">
 
     <include
-        android:id="@+id/include"
-        layout="@layout/bottom_layout"
-        tools:layout_editor_absoluteX="-58dp"
-        tools:layout_editor_absoluteY="108dp" />
+        android:id="@+id/include3"
+        layout="@layout/bottom_layout_horizontal" />
 
     <TextView
         android:id="@+id/libraryLocationText"
-        android:layout_width="288dp"
+        android:layout_width="0dp"
         android:layout_height="19dp"
         android:ems="10"
         android:inputType="text"
         android:text=""
         android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/checkBoxMarker"
         app:layout_constraintStart_toEndOf="@+id/locationText"
         app:layout_constraintTop_toTopOf="@+id/locationText" />
 
@@ -60,11 +59,10 @@
         android:id="@+id/photoLibrary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:text="Please select library picture:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map" />
+        app:layout_constraintStart_toStartOf="@+id/checkBoxCurrentLocation"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxCurrentLocation" />
 
     <TextView
         android:id="@+id/locationText"
@@ -81,23 +79,27 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
-        android:layout_height="209dp"
+        android:layout_height="0dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="45dp"
+        app:layout_constraintBottom_toBottomOf="@+id/include3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.217"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkBoxCurrentLocation" />
+        app:layout_constraintStart_toEndOf="@+id/filePhoto"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <SearchView
         android:id="@+id/searchLocation"
-        android:layout_width="275dp"
+        android:layout_width="0dp"
         android:layout_height="31dp"
-        android:layout_marginStart="7dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
         android:background="@drawable/search_bar"
         android:queryHint="Search address"
+        app:layout_constraintEnd_toEndOf="@+id/map"
         app:layout_constraintStart_toStartOf="@+id/map"
         app:layout_constraintTop_toTopOf="@+id/map" />
 
@@ -117,36 +119,35 @@
         android:id="@+id/filePhoto"
         android:layout_width="100dp"
         android:layout_height="30dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"
         android:text="from File"
         android:textSize="8sp"
-        app:layout_constraintStart_toStartOf="@+id/cameraPhoto"
-        app:layout_constraintTop_toBottomOf="@+id/cameraPhoto" />
+        app:layout_constraintStart_toEndOf="@+id/cameraPhoto"
+        app:layout_constraintTop_toTopOf="@+id/cameraPhoto" />
 
     <ImageView
         android:id="@+id/libraryImage"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/registerButton"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/map"
         app:layout_constraintHorizontal_bias="0.487"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/photoLibrary"
         app:layout_constraintTop_toBottomOf="@+id/filePhoto" />
 
     <Button
         android:id="@+id/registerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="45dp"
         android:text="Register new Library"
-        app:layout_constraintBottom_toBottomOf="@+id/include"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <CheckBox
         android:id="@+id/checkBoxCurrentLocation"

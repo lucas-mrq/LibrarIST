@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
@@ -85,7 +86,13 @@ public class NewLibrary extends AppCompatActivity implements
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_library);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_new_library_horizontal);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_new_library);
+        }
 
         //Define Theme Button
         Button themeButton = findViewById(R.id.themeButton);
@@ -398,4 +405,10 @@ public class NewLibrary extends AppCompatActivity implements
         PermissionUtils.requestLocationPermissions(this, LOCATION_PERMISSION_REQUEST_CODE, true);
         // [END maps_check_location_permission]
     }
+
+     @Override
+     public void onConfigurationChanged(Configuration newConfig) {
+         super.onConfigurationChanged(newConfig);
+         recreate();
+     }
 }
