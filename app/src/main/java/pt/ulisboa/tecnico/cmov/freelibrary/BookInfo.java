@@ -158,19 +158,35 @@ public class BookInfo extends AppCompatActivity {
             startActivity(intentLibrary);
         });
 
+        //Get Notification Book
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        Set<String> notificationBookIds = sharedPreferences.getStringSet("notificationBookIds", new HashSet<>());
+
         ImageButton notificationIcon = findViewById(R.id.notifications);
+        final boolean[] isNotification = {notificationBookIds.contains(String.valueOf(bookId))};
+        activeNotifications = isNotification[0];
+        if (activeNotifications) {
+            notificationIcon.setImageResource(R.drawable.notifications_active);
+        }
+        else {
+            notificationIcon.setImageResource(R.drawable.notifications_off);
+        }
         notificationIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (activeNotifications) {
                     notificationIcon.setImageResource(R.drawable.notifications_off);
-                    activeNotifications = false;
+                    notificationBookIds.remove(String.valueOf(bookId));
                 }
                 else {
                     notificationIcon.setImageResource(R.drawable.notifications_active);
-                    activeNotifications = true;
+                    notificationBookIds.add(String.valueOf(bookId));
                 }
+                activeNotifications = !activeNotifications;
 
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putStringSet("notificationBookIds", notificationBookIds);
+                editor.apply();
             }
         });
 
