@@ -47,10 +47,19 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
+import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class NewLibrary extends AppCompatActivity implements
         OnMapReadyCallback
          {
+
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
@@ -74,10 +83,15 @@ public class NewLibrary extends AppCompatActivity implements
 
     private ActivityResultLauncher<Intent> imageLibrary;
 
+    private ApiService apiService;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //Instantiate ApiService
+        apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
         if (ThemeManager.isDarkThemeEnabled()) {
             setTheme(R.style.AppThemeDark);
@@ -155,25 +169,8 @@ public class NewLibrary extends AppCompatActivity implements
             }
         });
 
-        Button registerButton = findViewById(R.id.registerButton);
-        registerButton.setOnClickListener(view -> {
-            /* Change to library features
-            TextView titleField = findViewById(R.id.nameBook); // Replace with actual id
-            TextView authorField = findViewById(R.id.authorBook); // Replace with actual id
-            TextView isbnField = findViewById(R.id.codeBarSend);
-
-            String bookTitle = titleField.getText().toString();
-            String bookAuthor = authorField.getText().toString();
-            String bookISBN = isbnField.getText().toString();
-
-            createAndCheckinBook(bookTitle, bookAuthor, bookISBN);
-
-            */
-        });
-
-
         //Define edit Location Button
-        libraryLocationText = (TextView) findViewById(R.id.libraryLocationText);
+        libraryLocationText = findViewById(R.id.libraryLocationText);
 
         // Define CheckBoxes
         markerCheckBox = findViewById(R.id.checkBoxMarker);
@@ -297,6 +294,28 @@ public class NewLibrary extends AppCompatActivity implements
         //Initialize the map fragment
         mapFragment.getMapAsync(this);
 
+        Button registerButton = findViewById(R.id.registerButton);
+        registerButton.setOnClickListener(view -> {
+            double latitude = 0;
+            double longitude = 0;
+
+            if (newLibraryLocation != null && !newLibraryLocation.equals(new LatLng(0, 0))) {
+                latitude = newLibraryLocation.latitude;
+                longitude = newLibraryLocation.longitude;
+
+                TextView libraryNameText = findViewById(R.id.libraryNameText);
+                String libraryName = libraryNameText.getText().toString();
+
+                if (!libraryName.isEmpty()) {
+                    createLibrary(new Library(libraryName, latitude, longitude));
+                } else {
+                    Toast.makeText(getApplicationContext(), "Library name cannot be empty", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "Latitude and Longitude cannot be empty", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     @Override
@@ -410,5 +429,31 @@ public class NewLibrary extends AppCompatActivity implements
      public void onConfigurationChanged(Configuration newConfig) {
          super.onConfigurationChanged(newConfig);
          recreate();
+     }
+
+     private void createLibrary(Library library) {
+         Call<Library> call = apiService.createLibrary(library);
+         call.enqueue(new Callback<Library>() {
+             @Override
+             public void onResponse(Call<Library> call, Response<Library> response) {
+                 if (response.isSuccessful()) {
+                     // Library created successfully
+                     Library createdLibrary = response.body();
+                     // Process the created library object as needed
+
+                     // Start the MainActivity
+                     Intent intent = new Intent(NewLibrary.this, MainActivity.class);
+                     startActivity(intent);
+                     finish();
+                 } else {
+                     Toast.makeText(getApplicationContext(), "Library creation failed", Toast.LENGTH_SHORT).show();
+                 }
+             }
+
+             @Override
+             public void onFailure(Call<Library> call, Throwable t) {
+                 Toast.makeText(getApplicationContext(), "Library creation failed", Toast.LENGTH_SHORT).show();
+             }
+         });
      }
 }
