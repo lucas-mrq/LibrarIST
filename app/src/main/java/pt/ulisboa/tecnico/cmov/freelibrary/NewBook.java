@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -109,6 +110,7 @@ public class NewBook extends AppCompatActivity {
 
         Button cameraBookButton = findViewById(R.id.cameraPhoto);
         cameraBookButton.setOnClickListener(view -> {
+            Log.d("CAMERABUTTONPER", "ola");
             // Ask CAMERA permission
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
