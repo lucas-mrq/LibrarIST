@@ -7,6 +7,12 @@ public class Library {
     public double longitude;
     public int distanceFromCurrentLocation;
 
+    public Library(String name, double latitude, double longitude) {
+        this.name = name;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public int getId() { return id; }
     public String getName() {
         return name;
