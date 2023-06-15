@@ -11,9 +11,17 @@
     <string name="library">Biblioteca: </string>
     <string name="title">Título: </string>
     <string name="barcode">Código de barras:</string>
-    <string name="selectpicture">Por favor, selecione a imagem do livro:</string>
+    <string name="selectpicture">Selecione a imagem do livro:</string>
     <string name="fromcamera">da Câmera</string>
     <string name="fromfile">do Arquivo</string>
     <string name="register">Registrar novo livro</string>
     <string name="booksearch">Pesquisar livro</string>
+    <string name="unknown">Livro desconhecido</string>
+    <string name="name">Nome: </string>
+    <string name="location">Localização: </string>
+    <string name="curent">Usar localização atual</string>
+    <string name="marker">Usar marcador</string>
+    <string name="librarypicture">Selecione a imagem da biblioteca: </string>
+    <string name="newlibrary">Registrar nova biblioteca</string>
+    <string name="addlibrary">Adicionar uma biblioteca</string>
 </resources>

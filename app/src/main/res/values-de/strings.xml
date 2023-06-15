@@ -17,4 +17,11 @@
     <string name="register">Neues Buch registrieren</string>
     <string name="booksearch">Buch suchen</string>
     <string name="unknown">Unbekanntes Buch</string>
+    <string name="name">Name: </string>
+    <string name="location">Ort: </string>
+    <string name="curent">Aktuellen Standort verwenden</string>
+    <string name="marker">Marker verwenden</string>
+    <string name="librarypicture">Bitte wählen Sie ein Bibliotheksbild aus: </string>
+    <string name="newlibrary">Neue Bibliothek registrieren</string>
+    <string name="addlibrary">Bibliothek hinzufügen</string>
 </resources>

@@ -15,12 +15,15 @@
 
     <TextView
         android:id="@+id/libraryLocationText"
-        android:layout_width="288dp"
+        android:layout_width="0dp"
         android:layout_height="19dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         android:ems="10"
         android:inputType="text"
         android:text=""
         android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/locationText"
         app:layout_constraintTop_toTopOf="@+id/locationText" />
 
@@ -39,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="30dp"
-        android:text="Name:"
+        android:text="@string/name"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -62,17 +65,17 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="15dp"
-        android:text="Please select library picture:"
+        android:text="@string/librarypicture"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map" />
 
     <TextView
         android:id="@+id/locationText"
-        android:layout_width="66dp"
+        android:layout_width="90dp"
         android:layout_height="20dp"
         android:ems="10"
         android:inputType="text"
-        android:text="Location:"
+        android:text="@string/location"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="@+id/locationLibrary"
         app:layout_constraintTop_toBottomOf="@+id/locationLibrary" />
@@ -97,7 +100,7 @@
         android:layout_marginStart="7dp"
         android:layout_marginTop="7dp"
         android:background="@drawable/search_bar"
-        android:queryHint="Search address"
+        android:queryHint="@string/search"
         app:layout_constraintStart_toStartOf="@+id/map"
         app:layout_constraintTop_toTopOf="@+id/map" />
 
@@ -107,7 +110,7 @@
         android:layout_width="100dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
-        android:text="from Camera"
+        android:text="@string/fromcamera"
         android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="@+id/photoLibrary"
         app:layout_constraintStart_toEndOf="@+id/photoLibrary"
@@ -118,7 +121,7 @@
         android:layout_width="100dp"
         android:layout_height="30dp"
         android:layout_marginTop="15dp"
-        android:text="from File"
+        android:text="@string/fromfile"
         android:textSize="8sp"
         app:layout_constraintStart_toStartOf="@+id/cameraPhoto"
         app:layout_constraintTop_toBottomOf="@+id/cameraPhoto" />
@@ -143,7 +146,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="45dp"
-        android:text="Register new Library"
+        android:text="@string/newlibrary"
         app:layout_constraintBottom_toBottomOf="@+id/include"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -152,7 +155,7 @@
         android:id="@+id/checkBoxCurrentLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Use current location"
+        android:text="@string/curent"
         app:layout_constraintStart_toStartOf="@+id/locationText"
         app:layout_constraintTop_toBottomOf="@+id/locationText" />
 
@@ -161,7 +164,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:text="Use marker"
+        android:text="@string/marker"
         app:layout_constraintStart_toEndOf="@+id/checkBoxCurrentLocation"
         app:layout_constraintTop_toTopOf="@+id/checkBoxCurrentLocation" />
 
