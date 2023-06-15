@@ -39,6 +39,9 @@
             android:exported="false"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".NewLibrary"
+            android:exported="false" />
+        <activity
             android:name=".LibraryInfo"
             android:exported="false"
             android:configChanges="orientation|screenSize" />
