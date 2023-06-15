@@ -17,4 +17,11 @@
     <string name="register">Enregistrer le livre</string>
     <string name="booksearch">Rechercher un livre</string>
     <string name="unknown">Livre inconnu</string>
+    <string name="name">Nom: </string>
+    <string name="location">Localisation: </string>
+    <string name="curent">Utiliser ma position</string>
+    <string name="marker">Utiliser un marqueur</string>
+    <string name="librarypicture">Selectionnez une photo de library: </string>
+    <string name="newlibrary">Enregistrer la nouvelle library</string>
+    <string name="addlibrary">Ajouter une librairie</string>
 </resources>
