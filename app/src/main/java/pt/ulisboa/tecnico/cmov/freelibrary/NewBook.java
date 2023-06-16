@@ -204,30 +204,40 @@ public class NewBook extends AppCompatActivity {
             }
         } else {
             Resources resources = getResources();
-            imageBitmap = BitmapFactory.decodeResource(resources, R.drawable.fables_cover);
+            imageBitmap = BitmapFactory.decodeResource(resources, R.drawable.book_cover);
         }
 
         // Create a temporary file to store the image
-        File imageFile = createTempImageFile();
-        if (imageFile == null) {
+        File compressedImageFile = createTempImageFile();
+        if (compressedImageFile == null) {
             // Handle the case where temporary file creation fails
             return null;
         }
 
-        // Save the bitmap to the temporary file
-        try (FileOutputStream outputStream = new FileOutputStream(imageFile)) {
-            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Handle the case where file writing fails
-            return null;
+        // Compress the bitmap with the desired quality factor (e.g., 50)
+        int desiredQuality = 50;
+        long targetFileSizeBytes = 1024 * 1024; // 1MB
+        int compressionStep = 10;
+        int currentQuality = 100;
+        long compressedFileSize = Long.MAX_VALUE;
+
+        while (compressedFileSize > targetFileSizeBytes && currentQuality >= desiredQuality) {
+            try (FileOutputStream outputStream = new FileOutputStream(compressedImageFile)) {
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, currentQuality, outputStream);
+                compressedFileSize = compressedImageFile.length();
+                currentQuality -= compressionStep;
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Handle the case where file writing fails
+                return null;
+            }
         }
 
         // Create a request body from the temporary file
-        RequestBody imageRequestBody = RequestBody.create(MediaType.parse("image/*"), imageFile);
+        RequestBody imageRequestBody = RequestBody.create(MediaType.parse("image/*"), compressedImageFile);
 
         // Create a MultipartBody.Part instance with the image file request body
-        return MultipartBody.Part.createFormData("imageFile", imageFile.getName(), imageRequestBody);
+        return MultipartBody.Part.createFormData("imageFile", compressedImageFile.getName(), imageRequestBody);
     }
 
 
@@ -255,7 +265,7 @@ public class NewBook extends AppCompatActivity {
                     Book createdBook = response.body();
                     checkInBook(libraryId, createdBook.getId());
                 } else {
-                    Toast.makeText(getApplicationContext(), "Book creation failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Book creation failed (" + response.code() + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -315,3 +325,4 @@ public class NewBook extends AppCompatActivity {
         recreate();
     }
 }
+
