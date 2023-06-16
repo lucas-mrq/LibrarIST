@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,9 +11,7 @@ import android.content.res.Resources;
 import android.location.Location;
 import android.os.Build;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import android.widget.ArrayAdapter;
@@ -23,21 +20,20 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.text.HtmlCompat;
 
+
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.bumptech.glide.Glide;
 
-import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +44,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
-import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
 
@@ -64,6 +59,8 @@ public class BookInfo extends AppCompatActivity {
     private LatLng currentLocation;
     private static final double EARTH_RADIUS = 6371; // Earth's radius in kilometers
     DecimalFormat decimalFormat = new DecimalFormat("#.#");
+    ListView availabilityListView;
+    List<String> availabilityList;
 
 
     @Override
@@ -109,8 +106,8 @@ public class BookInfo extends AppCompatActivity {
         authorText.setText(author);
 
         // Define available libraries
-        ListView availabilityListView = findViewById(R.id.listofLibraryWhereBookAvailable);
-        List<String> availabilityList = new ArrayList<>();
+        availabilityListView = findViewById(R.id.listofLibraryWhereBookAvailable);
+        availabilityList = new ArrayList<>();
 
         // Get current location
         // Check for location permissions
@@ -128,87 +125,17 @@ public class BookInfo extends AppCompatActivity {
                             if (location != null) {
                                 // Location found, you can access the latitude and longitude
                                 currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                fetchLibraries(bookId);  // Fetch libraries only after location is successfully fetched
                             }
                         }
                     })
                     .addOnFailureListener(this, new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            // Failed to get location, handle the error
+                            Toast.makeText(BookInfo.this, "Unable to get user location", Toast.LENGTH_SHORT).show();
                         }
                     });
         }
-
-        // Fetch the libraries
-        Call<List<Library>> call = apiService.getAvailableBooksInLibrary(bookId);
-        call.enqueue(new Callback<List<Library>>() {
-
-            //Get Favorite Libraries
-            SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-            Set<String> favoriteLibraryIds = sharedPreferences.getStringSet("favoriteLibraryIds", new HashSet<>());
-
-            @Override
-            public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
-                if(response.isSuccessful() && response.body() != null) {
-
-                    List<Library> multipleLibraries = response.body();
-                    List<Library> libraries = new ArrayList<>();
-
-                    for (Library library : multipleLibraries) {
-                        boolean libraryExists = false;
-                        for (Library uniqueLibrary : libraries) {
-                            if (uniqueLibrary.getName().equals(library.getName())) {
-                                libraryExists = true;
-                                break;
-                            }
-                        }
-                        if (!libraryExists) {
-                            libraries.add(library);
-                        }
-                    }
-
-                    for (Library library : libraries) {
-                        double distance = calculateDistance(currentLocation.latitude, currentLocation.longitude, library.latitude, library.longitude );
-                        int distanceInMeter = (int) (distance*1000);
-                        library.setDistanceFromCurrentLocation(distanceInMeter);
-
-                    }
-
-                    allLibraries.addAll(libraries);
-                    Collections.sort(allLibraries, Comparator.comparingInt(Library::getDistanceFromCurrentLocation));
-
-                    for (Library library : allLibraries) {
-                        // Format the distance
-                        int distance = library.getDistanceFromCurrentLocation();
-                        String unity = " m";
-                        if (library.getDistanceFromCurrentLocation()>=1000) {
-                            distance = distance / 1000;
-                            unity = " km";
-                        }
-                        String distanceFormatted = decimalFormat.format(distance);
-                        String LibraryName;
-                        if (favoriteLibraryIds.contains(String.valueOf(library.getId()))) {
-                            LibraryName = "☆ " + library.getName() + "   " + distanceFormatted + unity;
-                        }
-                        else {
-                            LibraryName = library.getName() + "    " + distanceFormatted + unity;
-
-                        }
-                        availabilityList.add(LibraryName);
-                    }
-
-                    ArrayAdapter<String> availabilityAdapter = new ArrayAdapter<>(BookInfo.this, android.R.layout.simple_list_item_1, availabilityList);
-                    availabilityListView.setAdapter(availabilityAdapter);
-                } else {
-                    // handle the case where response is not successful or body is null
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Library>> call, Throwable t) {
-                // handle failure scenario here
-            }
-        });
 
         availabilityListView.setOnItemClickListener((adapterView, view, position, id) -> {
             Library library = allLibraries.get(position);
@@ -350,4 +277,80 @@ public class BookInfo extends AppCompatActivity {
 
         return distance;
     }
+
+    private void fetchLibraries(int bookId) {
+        // Fetch the libraries
+        Call<List<Library>> call = apiService.getAvailableBooksInLibrary(bookId);
+        call.enqueue(new Callback<List<Library>>() {
+
+            // Get Favorite Libraries
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+            Set<String> favoriteLibraryIds = sharedPreferences.getStringSet("favoriteLibraryIds", new HashSet<>());
+
+            @Override
+            public void onResponse(Call<List<Library>> call, Response<List<Library>> response) {
+                if(response.isSuccessful() && response.body() != null) {
+                    List<Library> multipleLibraries = response.body();
+                    List<Library> libraries = new ArrayList<>();
+
+                    for (Library library : multipleLibraries) {
+                        boolean libraryExists = false;
+                        for (Library uniqueLibrary : libraries) {
+                            if (uniqueLibrary.getName().equals(library.getName())) {
+                                libraryExists = true;
+                                break;
+                            }
+                        }
+                        if (!libraryExists) {
+                            libraries.add(library);
+                        }
+                    }
+
+                    for (Library library : libraries) {
+                        if(currentLocation != null) {
+                            double distance = calculateDistance(currentLocation.latitude, currentLocation.longitude, library.latitude, library.longitude );
+                            int distanceInMeter = (int) (distance*1000);
+                            library.setDistanceFromCurrentLocation(distanceInMeter);
+                        } else {
+                            library.setDistanceFromCurrentLocation(Integer.MAX_VALUE); // Or some suitable default value
+                        }
+                    }
+
+                    allLibraries.addAll(libraries);
+                    Collections.sort(allLibraries, Comparator.comparingInt(Library::getDistanceFromCurrentLocation));
+
+                    for (Library library : allLibraries) {
+                        // Format the distance
+                        int distance = library.getDistanceFromCurrentLocation();
+                        String unity = " m";
+                        if (library.getDistanceFromCurrentLocation()>=1000) {
+                            distance = distance / 1000;
+                            unity = " km";
+                        }
+                        String distanceFormatted = decimalFormat.format(distance);
+                        String LibraryName;
+                        if (favoriteLibraryIds.contains(String.valueOf(library.getId()))) {
+                            LibraryName = "☆ " + library.getName() + "   " + distanceFormatted + unity;
+                        }
+                        else {
+                            LibraryName = library.getName() + "    " + distanceFormatted + unity;
+
+                        }
+                        availabilityList.add(LibraryName);
+                    }
+
+                    ArrayAdapter<String> availabilityAdapter = new ArrayAdapter<>(BookInfo.this, android.R.layout.simple_list_item_1, availabilityList);
+                    availabilityListView.setAdapter(availabilityAdapter);
+                } else {
+                    Toast.makeText(BookInfo.this, "Unable to get nearby libraries", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Library>> call, Throwable t) {
+                Toast.makeText(BookInfo.this, "Unable to get nearby libraries", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }

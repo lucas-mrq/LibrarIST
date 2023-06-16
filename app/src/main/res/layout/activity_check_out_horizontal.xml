@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/newBookView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CheckOut">
+
+    <include
+        android:id="@+id/include5"
+        layout="@layout/bottom_layout_horizontal" />
+
+    <SurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="320dp"
+        android:layout_height="240dp"
+        android:layout_marginStart="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/include5"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/codeBar"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="@+id/libraryBookName"
+        app:layout_constraintTop_toBottomOf="@+id/libraryBookName" />
+
+    <TextView
+        android:id="@+id/libraryBookName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="15dp"
+        android:text="Library"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/surface_view"
+        app:layout_constraintTop_toTopOf="@+id/surface_view" />
+
+    <Button
+        android:id="@+id/checkOutRegisterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="@string/checkout"
+        app:layout_constraintStart_toStartOf="@+id/codeBar"
+        app:layout_constraintTop_toBottomOf="@+id/codeBar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

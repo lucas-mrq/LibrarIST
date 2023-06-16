@@ -190,13 +190,13 @@ public class CheckIn extends AppCompatActivity {
                     startActivity(intentLibraryInfo);
                     finish();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Book checked in failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Book check in failed", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                // Handle the failure (e.g., network error)
+                Toast.makeText(getApplicationContext(), "Book check in failed", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -20,6 +20,13 @@ public interface ApiService {
     @POST("/api/libraries")
     Call<Library> createLibrary(@Body Library library);
 
+    @Multipart
+    @POST("/api/libraries")
+    Call<Library> createLibrary(@Part("name") RequestBody name,
+                          @Part("latitude") RequestBody latitude,
+                          @Part("longitude") RequestBody longitude,
+                          @Part MultipartBody.Part imageFile);
+
     @PUT("api/libraries/{id}")
     Call<Library> updateLibrary(@Path("id") int id, @Body Library library);
 
@@ -54,4 +61,7 @@ public interface ApiService {
 
     @POST("/api/libraries/{libraryId}/books/{bookId}/checkin")
     Call<Void> checkInBook(@Path("libraryId") int libraryId, @Path("bookId") int bookId);
+
+    @POST("/api/libraries/{libraryId}/book/{bookId}/checkout")
+    Call<Void> checkOutBook(@Path("libraryId") int libraryId, @Path("bookId") int bookId);
 }
