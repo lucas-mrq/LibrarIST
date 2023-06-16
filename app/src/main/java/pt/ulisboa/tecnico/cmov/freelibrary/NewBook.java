@@ -2,9 +2,11 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,9 +26,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Locale;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
@@ -39,6 +46,7 @@ public class NewBook extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private ActivityResultLauncher<Intent> imageBook;
+    private Uri selectedImageUri = null;
     private ApiService apiService;
 
     @Override
@@ -88,9 +96,11 @@ public class NewBook extends AppCompatActivity {
                         if (extras != null) {
                             Bitmap imageBitmap = (Bitmap) extras.get("data");
                             bookImage.setImageBitmap(imageBitmap);
+                            selectedImageUri = getImageUri(getApplicationContext(), imageBitmap);
                         }
                     } else {
                         bookImage.setImageURI(uri);
+                        selectedImageUri = uri;
                     }
                 }
             }
@@ -175,13 +185,69 @@ public class NewBook extends AppCompatActivity {
         RequestBody authorBody = RequestBody.create(MediaType.parse("text/plain"), bookAuthor);
         RequestBody isbnBody = RequestBody.create(MediaType.parse("text/plain"), bookISBN);
 
-        int libraryId = getIntent().getIntExtra("libraryId", 0); // Replace "libraryId" with the actual key used to pass the library ID
+        MultipartBody.Part imageFilePart = prepareImageFile();
 
-        createBook(titleBody, authorBody, isbnBody, libraryId);
+        int libraryId = getIntent().getIntExtra("libraryId", 0);
+
+        createBook(titleBody, authorBody, isbnBody, imageFilePart, libraryId);
     }
 
-    private void createBook(RequestBody title, RequestBody author, RequestBody isbn, int libraryId) {
-        Call<Book> createBookCall = apiService.createBook(title, author, isbn);
+    private MultipartBody.Part prepareImageFile() {
+        Bitmap imageBitmap;
+
+        if (selectedImageUri != null) {
+            try {
+                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            Resources resources = getResources();
+            imageBitmap = BitmapFactory.decodeResource(resources, R.drawable.fables_cover);
+        }
+
+        // Create a temporary file to store the image
+        File imageFile = createTempImageFile();
+        if (imageFile == null) {
+            // Handle the case where temporary file creation fails
+            return null;
+        }
+
+        // Save the bitmap to the temporary file
+        try (FileOutputStream outputStream = new FileOutputStream(imageFile)) {
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle the case where file writing fails
+            return null;
+        }
+
+        // Create a request body from the temporary file
+        RequestBody imageRequestBody = RequestBody.create(MediaType.parse("image/jpeg"), imageFile);
+
+        // Create a MultipartBody.Part instance with the image file request body
+        return MultipartBody.Part.createFormData("imageFile", imageFile.getName(), imageRequestBody);
+    }
+
+
+    private File createTempImageFile() {
+        // Create a temporary file in the cache directory
+        File cacheDir = getCacheDir();
+        String fileName = "temp_image.jpg";
+        return new File(cacheDir, fileName);
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+
+    private void createBook(RequestBody title, RequestBody author, RequestBody isbn, MultipartBody.Part imageFile, int libraryId) {
+        Call<Book> createBookCall = apiService.createBook(title, author, isbn, imageFile);
         createBookCall.enqueue(new Callback<Book>() {
             @Override
             public void onResponse(Call<Book> call, Response<Book> response) {
@@ -195,7 +261,7 @@ public class NewBook extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Book> call, Throwable t) {
-                // Handle the failure (e.g., network error)
+                Toast.makeText(getApplicationContext(), "Book creation failed: network error", Toast.LENGTH_SHORT).show();
             }
         });
     }
