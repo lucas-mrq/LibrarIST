@@ -70,6 +70,7 @@ public class LibraryInfo extends AppCompatActivity
     private ApiService apiService;
     private GoogleMap mGoogleMap;
     private int libraryId;
+    private String libraryName;
     private int zoomMap = 15;
 
     LatLng libraryLocation;
@@ -103,17 +104,7 @@ public class LibraryInfo extends AppCompatActivity
 
         //Get Library Name
         Intent intent = getIntent();
-        String name = intent.getStringExtra("name");
         libraryId = intent.getIntExtra("libraryId", 1);
-        TextView titleText = (TextView) findViewById(R.id.libraryName);
-        titleText.setText(name);
-
-        String imageUrl = intent.getStringExtra("image");
-        ImageView libraryImage = (ImageView) findViewById(R.id.libraryImage);
-
-        Glide.with(this)
-                .load(imageUrl)
-                .into(libraryImage);
 
         //Get Favorite Libraries
         SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
@@ -193,7 +184,7 @@ public class LibraryInfo extends AppCompatActivity
         Button checkInButton = (Button) findViewById(R.id.inButton);
         checkInButton.setOnClickListener(view -> {
             Intent intentCheckIn = new Intent(LibraryInfo.this, CheckIn.class);
-            intentCheckIn.putExtra("library", name);
+            intentCheckIn.putExtra("library", libraryName);
             intentCheckIn.putExtra("libraryId", libraryId);
             startActivity(intentCheckIn);
         });
@@ -202,7 +193,7 @@ public class LibraryInfo extends AppCompatActivity
         Button checkOutButton = (Button) findViewById(R.id.outButton);
         checkOutButton.setOnClickListener(view -> {
             Intent intentCheckOut = new Intent(LibraryInfo.this, CheckOut.class);
-            intentCheckOut.putExtra("library", name);
+            intentCheckOut.putExtra("library", libraryName);
             intentCheckOut.putExtra("libraryId", libraryId);
             startActivity(intentCheckOut);
         });
@@ -218,7 +209,7 @@ public class LibraryInfo extends AppCompatActivity
             public void onClick(View view) {
 
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                String textToShare = name + ": This library is amazing !";
+                String textToShare = libraryName + ": This library is amazing !";
                 shareIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
                 shareIntent.putExtra(Intent.EXTRA_TITLE,"This library is amazing !");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "This library is amazing !"); // the subject of an email
@@ -309,6 +300,17 @@ public class LibraryInfo extends AppCompatActivity
                             libraryLocation = new LatLng(library.latitude, library.longitude);
                             mGoogleMap.addMarker(new MarkerOptions().position(libraryLocation).title(library.name));
                             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(libraryLocation, zoomMap));
+
+                            // Set the library name and image
+                            libraryName = library.getName();
+                            TextView titleText = findViewById(R.id.libraryName);
+                            titleText.setText(libraryName);
+
+                            ImageView libraryImage = findViewById(R.id.libraryImage);
+                            Glide.with(LibraryInfo.this)
+                                    .load(library.getImageUrl())
+                                    .into(libraryImage);
+
                             return;
                         }
                     }
