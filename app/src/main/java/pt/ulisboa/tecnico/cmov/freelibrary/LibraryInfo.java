@@ -49,6 +49,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -106,6 +107,13 @@ public class LibraryInfo extends AppCompatActivity
         libraryId = intent.getIntExtra("libraryId", 1);
         TextView titleText = (TextView) findViewById(R.id.libraryName);
         titleText.setText(name);
+
+        String imageUrl = intent.getStringExtra("image");
+        ImageView libraryImage = (ImageView) findViewById(R.id.libraryImage);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .into(libraryImage);
 
         //Get Favorite Libraries
         SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
