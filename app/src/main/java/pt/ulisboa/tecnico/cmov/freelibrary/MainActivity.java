@@ -63,7 +63,9 @@ import java.util.Set;
 import java.io.IOException;
 
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
+import pt.ulisboa.tecnico.cmov.freelibrary.api.BooksCallback;
 import pt.ulisboa.tecnico.cmov.freelibrary.databinding.ActivityMainBinding;
+import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
 import pt.ulisboa.tecnico.cmov.freelibrary.network.RetrofitClient;
 
@@ -212,8 +214,54 @@ public class MainActivity extends AppCompatActivity
         mGoogleMap.setOnMarkerClickListener(this);
         fetchLibraries();
         enableMyLocation();
+        sendNotification();
     }
 
+    public void sendNotification() {
+        NotificationHelper.createNotificationChannel(this);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+
+        //Get Favorite Library
+        Set<String> favoriteLibraryIds = sharedPreferences.getStringSet("favoriteLibraryIds", new HashSet<>());
+
+        //Get Notification Book
+        Set<String> notificationBookIds = sharedPreferences.getStringSet("notificationBookIds", new HashSet<>());
+
+        //Instantiate ApiService
+        apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+
+        for (String libraryId : favoriteLibraryIds) {
+            fetchBooks(Integer.parseInt(libraryId), new BooksCallback() {
+                @Override
+                public void onBooksFetched(List<Book> books) {
+                    // Handle the fetched books
+                    if (books != null) {
+                        for (Book book : books) {
+                            if (notificationBookIds.contains(String.valueOf(book.getId()))) {
+                                String title = book.getTitle() + " " + getString(R.string.available);
+                                String message = getString(R.string.favoritelibrary);
+                                if (libraries != null) {
+                                    for (Library library : libraries) {
+                                        if (String.valueOf(library.getId()).equals(libraryId)) {
+                                            message = getString(R.string.favoritelibrary) + " " + library.getName();
+                                        }
+                                    }
+                                    NotificationHelper.showNotification(MainActivity.this, title, message);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFetchFailed() {
+                    // Handle the fetch failure
+                    Log.e("FETCHBOOKS", "Failed to fetch books");
+                }
+            });
+        }
+    }
 
     private void fetchLibraries() {
         //Get Favorite Libraries
@@ -373,5 +421,24 @@ public class MainActivity extends AppCompatActivity
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         recreate();
+    }
+
+    private void fetchBooks(int libraryId, final BooksCallback callback) {
+        apiService.getBooksByLibraryId(libraryId).enqueue(new Callback<List<Book>>() {
+            @Override
+            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+                if (response.isSuccessful()) {
+                    List<Book> books = response.body();
+                    callback.onBooksFetched(books);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Book>> call, Throwable t) {
+                // Handle error here
+                t.printStackTrace();
+                callback.onFetchFailed();
+            }
+        });
     }
 }

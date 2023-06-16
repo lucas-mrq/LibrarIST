@@ -17,4 +17,6 @@
     <string name="register">Enregistrer le livre</string>
     <string name="booksearch">Rechercher un livre</string>
     <string name="unknown">Livre inconnu</string>
+    <string name="available"> est disponible</string>
+    <string name="favoritelibrary">Récupérez-le à </string>
 </resources>

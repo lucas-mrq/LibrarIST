@@ -16,4 +16,7 @@
     <string name="fromfile">do Arquivo</string>
     <string name="register">Registrar novo livro</string>
     <string name="booksearch">Pesquisar livro</string>
+    <string name="unknown">Livro desconhecido</string>
+    <string name="available"> está disponível</string>
+    <string name="favoritelibrary">Escolha-o em </string>
 </resources>

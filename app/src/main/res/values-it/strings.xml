@@ -17,4 +17,6 @@
     <string name="register">Registra nuovo libro</string>
     <string name="booksearch">Cerca libro</string>
     <string name="unknown">Libro sconosciuto</string>
+    <string name="available"> è disponibile</string>
+    <string name="favoritelibrary">Sceglilo presso </string>
 </resources>
