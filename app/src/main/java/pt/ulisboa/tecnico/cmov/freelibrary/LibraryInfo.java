@@ -70,7 +70,7 @@ public class LibraryInfo extends AppCompatActivity
     private ApiService apiService;
     private GoogleMap mGoogleMap;
     private int libraryId;
-    private String libraryName;
+    private String libraryName = "";
     private int zoomMap = 15;
 
     LatLng libraryLocation;
