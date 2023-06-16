@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.freelibrary.api;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
@@ -37,6 +38,13 @@ public interface ApiService {
 
     @GET("api/libraries/books/{bookId}")
     Call<List<Library>> getAvailableBooksInLibrary(@Path("bookId") int bookId);
+
+    @Multipart
+    @POST("/api/books")
+    Call<Book> createBook(@Part("title") RequestBody title,
+                          @Part("author") RequestBody author,
+                          @Part("isbn") RequestBody isbn,
+                          @Part MultipartBody.Part imageFile);
 
     @Multipart
     @POST("/api/books")
