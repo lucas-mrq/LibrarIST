@@ -224,7 +224,7 @@ public class NewBook extends AppCompatActivity {
         }
 
         // Create a request body from the temporary file
-        RequestBody imageRequestBody = RequestBody.create(MediaType.parse("image/jpeg"), imageFile);
+        RequestBody imageRequestBody = RequestBody.create(MediaType.parse("image/*"), imageFile);
 
         // Create a MultipartBody.Part instance with the image file request body
         return MultipartBody.Part.createFormData("imageFile", imageFile.getName(), imageRequestBody);
