@@ -1,12 +1,15 @@
 package pt.ulisboa.tecnico.cmov.freelibrary;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.location.Location;
 import android.os.Build;
 
 import android.net.Uri;
@@ -21,13 +24,24 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +61,10 @@ public class BookInfo extends AppCompatActivity {
     private ApiService apiService;
     private List<Library> allLibraries = new ArrayList<>();
     private boolean activeNotifications = false;
+    private LatLng currentLocation;
+    private static final double EARTH_RADIUS = 6371; // Earth's radius in kilometers
+    DecimalFormat decimalFormat = new DecimalFormat("#.#");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +112,33 @@ public class BookInfo extends AppCompatActivity {
         ListView availabilityListView = findViewById(R.id.listofLibraryWhereBookAvailable);
         List<String> availabilityList = new ArrayList<>();
 
+        // Get current location
+        // Check for location permissions
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            // Create a FusedLocationProviderClient
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+            // Request location updates
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                // Location found, you can access the latitude and longitude
+                                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                            }
+                        }
+                    })
+                    .addOnFailureListener(this, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Failed to get location, handle the error
+                        }
+                    });
+        }
+
         // Fetch the libraries
         Call<List<Library>> call = apiService.getAvailableBooksInLibrary(bookId);
         call.enqueue(new Callback<List<Library>>() {
@@ -122,26 +167,36 @@ public class BookInfo extends AppCompatActivity {
                         }
                     }
 
-                    List<Library> favoriteLibraries = new ArrayList<>();
-                    List<Library> otherLibraries = new ArrayList<>();
                     for (Library library : libraries) {
-                        if (favoriteLibraryIds.contains(String.valueOf(library.getId()))) {
-                            favoriteLibraries.add(library);
-                        } else {
-                            otherLibraries.add(library);
+                        double distance = calculateDistance(currentLocation.latitude, currentLocation.longitude, library.latitude, library.longitude );
+                        int distanceInMeter = (int) (distance*1000);
+                        library.setDistanceFromCurrentLocation(distanceInMeter);
+
+                    }
+
+                    allLibraries.addAll(libraries);
+                    Collections.sort(allLibraries, Comparator.comparingInt(Library::getDistanceFromCurrentLocation));
+
+                    for (Library library : allLibraries) {
+                        // Format the distance
+                        int distance = library.getDistanceFromCurrentLocation();
+                        String unity = " m";
+                        if (library.getDistanceFromCurrentLocation()>=1000) {
+                            distance = distance / 1000;
+                            unity = " km";
                         }
+                        String distanceFormatted = decimalFormat.format(distance);
+                        String LibraryName;
+                        if (favoriteLibraryIds.contains(String.valueOf(library.getId()))) {
+                            LibraryName = "☆ " + library.getName() + "   " + distanceFormatted + unity;
+                        }
+                        else {
+                            LibraryName = library.getName() + "    " + distanceFormatted + unity;
+
+                        }
+                        availabilityList.add(LibraryName);
                     }
 
-                    allLibraries.addAll(favoriteLibraries);
-                    allLibraries.addAll(otherLibraries);
-
-                    for (Library library : favoriteLibraries) {
-                        String favoriteLibrary = "☆ " + library.getName() + " ☆";
-                        availabilityList.add(favoriteLibrary);
-                    }
-                    for (Library library : otherLibraries) {
-                        availabilityList.add(library.getName());
-                    }
                     ArrayAdapter<String> availabilityAdapter = new ArrayAdapter<>(BookInfo.this, android.R.layout.simple_list_item_1, availabilityList);
                     availabilityListView.setAdapter(availabilityAdapter);
                 } else {
@@ -197,7 +252,7 @@ public class BookInfo extends AppCompatActivity {
                 shareIntent.setType("text/plain");
                 startActivity(Intent.createChooser(shareIntent, null));
 
-                /* Try to shar just an image
+                /* Try to share just an image
                 Context context = BookInfo.this;
                 int imageResourceId = context.getResources().getIdentifier("free_library_example", "drawable", context.getPackageName());
                 Uri uri = Uri.parse("android.resource://" + context.getPackageName() + "/" + imageResourceId);
@@ -255,5 +310,28 @@ public class BookInfo extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         recreate();
+    }
+
+    public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        // Convert latitude and longitude to radians
+        double lat1Rad = Math.toRadians(lat1);
+        double lon1Rad = Math.toRadians(lon1);
+        double lat2Rad = Math.toRadians(lat2);
+        double lon2Rad = Math.toRadians(lon2);
+
+        // Calculate the differences between the latitude and longitude values
+        double latDiff = lat2Rad - lat1Rad;
+        double lonDiff = lon2Rad - lon1Rad;
+
+        // Calculate the distance using the Haversine formula
+        double a = Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+                Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                        Math.sin(lonDiff / 2) * Math.sin(lonDiff / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        double distance = EARTH_RADIUS * c;
+
+        return distance;
     }
 }
