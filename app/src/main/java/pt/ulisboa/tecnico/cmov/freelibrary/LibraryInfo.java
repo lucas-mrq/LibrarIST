@@ -160,7 +160,7 @@ public class LibraryInfo extends AppCompatActivity
                     intent1.putExtra("id", book.getId());
                     intent1.putExtra("title", book.getTitle());
                     intent1.putExtra("author", book.getAuthor());
-                    intent1.putExtra("image", book.getImage());
+                    intent1.putExtra("image", book.getImageUrl());
                     startActivity(intent1);
                 });
             }

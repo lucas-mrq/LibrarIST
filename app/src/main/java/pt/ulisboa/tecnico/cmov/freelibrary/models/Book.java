@@ -5,17 +5,13 @@ public class Book {
     public String title;
     public String author;
     public String isbn;
+    public String imageUrl;
 
-    private int coverId;
-
-    public Book(int id, String title, String author, int coverId) {
+    public Book(int id, String title, String author) {
         this.id = id;
         this.title = title;
         this.author = author;
-        this.coverId = coverId;
     }
-
-    public int getImage() { return coverId;}
 
     public int getId() {
         return id;
@@ -32,4 +28,6 @@ public class Book {
     public String getAuthor() {
         return author;
     }
+
+    public String getImageUrl() { return "https://librarist.evandro.pt" + imageUrl;}
 }

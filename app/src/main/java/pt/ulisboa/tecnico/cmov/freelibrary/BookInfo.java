@@ -35,6 +35,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.bumptech.glide.Glide;
 
 import java.io.InputStream;
 import java.text.DecimalFormat;
@@ -67,7 +68,6 @@ public class BookInfo extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         if (ThemeManager.isDarkThemeEnabled()) {
             setTheme(R.style.AppThemeDark);
         } else {
@@ -94,15 +94,19 @@ public class BookInfo extends AppCompatActivity {
         int bookId = intent.getIntExtra("id", 0);
         String title = intent.getStringExtra("title");
         String author = intent.getStringExtra("author");
-        int image = intent.getIntExtra("image", R.drawable.fables_cover);
+        String image = intent.getStringExtra("image");
 
         TextView titleText = (TextView) findViewById(R.id.bookTitle);
         TextView authorText = (TextView) findViewById(R.id.bookAuthor);
         ImageView coverImage = (ImageView) findViewById((R.id.cover));
 
+        Glide
+                .with(this)
+                .load(image)
+                .into(coverImage);
+
         titleText.setText(title);
         authorText.setText(author);
-        coverImage.setImageResource(image);
 
         // Define available libraries
         ListView availabilityListView = findViewById(R.id.listofLibraryWhereBookAvailable);
