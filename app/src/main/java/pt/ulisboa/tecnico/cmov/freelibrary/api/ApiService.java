@@ -20,6 +20,13 @@ public interface ApiService {
     @POST("/api/libraries")
     Call<Library> createLibrary(@Body Library library);
 
+    @Multipart
+    @POST("/api/libraries")
+    Call<Library> createLibrary(@Part("name") RequestBody name,
+                          @Part("latitude") RequestBody latitude,
+                          @Part("longitude") RequestBody longitude,
+                          @Part MultipartBody.Part imageFile);
+
     @PUT("api/libraries/{id}")
     Call<Library> updateLibrary(@Path("id") int id, @Body Library library);
 

@@ -3,10 +3,13 @@ package pt.ulisboa.tecnico.cmov.freelibrary;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -42,11 +45,16 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import pt.ulisboa.tecnico.cmov.freelibrary.api.ApiService;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Book;
 import pt.ulisboa.tecnico.cmov.freelibrary.models.Library;
@@ -62,7 +70,7 @@ public class NewLibrary extends AppCompatActivity implements
 
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-
+    private Uri selectedImageUri = null;
     private GoogleMap mGoogleMap;
     private SearchView searchLocation;
     private SupportMapFragment mapFragment;
@@ -137,9 +145,11 @@ public class NewLibrary extends AppCompatActivity implements
                         if (extras != null) {
                             Bitmap imageBitmap = (Bitmap) extras.get("data");
                             libraryImage.setImageBitmap(imageBitmap);
+                            selectedImageUri = getImageUri(getApplicationContext(), imageBitmap);
                         }
                     } else {
                         libraryImage.setImageURI(uri);
+                        selectedImageUri = uri;
                     }
                 }
             }
@@ -432,7 +442,12 @@ public class NewLibrary extends AppCompatActivity implements
      }
 
      private void createLibrary(Library library) {
-         Call<Library> call = apiService.createLibrary(library);
+         RequestBody nameBody = RequestBody.create(MediaType.parse("text/plain"), library.name);
+         RequestBody latitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(library.latitude));
+         RequestBody longitudeBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(library.longitude));
+
+         MultipartBody.Part imageFilePart = prepareImageFile();
+         Call<Library> call = apiService.createLibrary(nameBody, latitudeBody, longitudeBody, imageFilePart);
          call.enqueue(new Callback<Library>() {
              @Override
              public void onResponse(Call<Library> call, Response<Library> response) {
@@ -456,4 +471,67 @@ public class NewLibrary extends AppCompatActivity implements
              }
          });
      }
-}
+
+     private File createTempImageFile() {
+         // Create a temporary file in the cache directory
+         File cacheDir = getCacheDir();
+         String fileName = "temp_image.jpg";
+         return new File(cacheDir, fileName);
+     }
+
+     public Uri getImageUri(Context inContext, Bitmap inImage) {
+         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+         return Uri.parse(path);
+     }
+
+     private MultipartBody.Part prepareImageFile() {
+         Bitmap imageBitmap;
+
+         if (selectedImageUri != null) {
+             try {
+                 imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+             } catch (IOException e) {
+                 e.printStackTrace();
+                 return null;
+             }
+         } else {
+             Resources resources = getResources();
+             imageBitmap = BitmapFactory.decodeResource(resources, R.drawable.exemple);
+         }
+
+         // Create a temporary file to store the image
+         File compressedImageFile = createTempImageFile();
+         if (compressedImageFile == null) {
+             // Handle the case where temporary file creation fails
+             return null;
+         }
+
+         // Compress the bitmap with the desired quality factor (e.g., 50)
+         int desiredQuality = 50;
+         long targetFileSizeBytes = 1024 * 1024; // 1MB
+         int compressionStep = 10;
+         int currentQuality = 100;
+         long compressedFileSize = Long.MAX_VALUE;
+
+         while (compressedFileSize > targetFileSizeBytes && currentQuality >= desiredQuality) {
+             try (FileOutputStream outputStream = new FileOutputStream(compressedImageFile)) {
+                 imageBitmap.compress(Bitmap.CompressFormat.JPEG, currentQuality, outputStream);
+                 compressedFileSize = compressedImageFile.length();
+                 currentQuality -= compressionStep;
+             } catch (IOException e) {
+                 e.printStackTrace();
+                 // Handle the case where file writing fails
+                 return null;
+             }
+         }
+
+         // Create a request body from the temporary file
+         RequestBody imageRequestBody = RequestBody.create(MediaType.parse("image/*"), compressedImageFile);
+
+         // Create a MultipartBody.Part instance with the image file request body
+         return MultipartBody.Part.createFormData("imageFile", compressedImageFile.getName(), imageRequestBody);
+     }
+
+ }

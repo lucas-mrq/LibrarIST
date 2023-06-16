@@ -5,6 +5,8 @@ public class Library {
     public String name;
     public double latitude;
     public double longitude;
+
+    public String imageUrl;
     public int distanceFromCurrentLocation;
 
     public Library(String name, double latitude, double longitude) {
@@ -17,6 +19,8 @@ public class Library {
     public String getName() {
         return name;
     }
+
+    public String getImageUrl() { return "https://librarist.evandro.pt" + imageUrl; }
 
     public int getDistanceFromCurrentLocation() {
         return distanceFromCurrentLocation;
