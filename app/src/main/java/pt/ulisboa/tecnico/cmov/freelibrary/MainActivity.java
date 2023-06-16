@@ -270,10 +270,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLibraryClick(boolean isFavorite, String name, String address, int libraryId) {
+    public void onLibraryClick(boolean isFavorite, String name, String address, int libraryId, String libraryImageUrl) {
         Intent intent = new Intent(MainActivity.this, LibraryInfo.class);
         intent.putExtra("name", name);
         intent.putExtra("libraryId", libraryId);
+        intent.putExtra("image", libraryImageUrl);
         startActivity(intent);
     }
 
@@ -281,7 +282,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onMarkerClick(Marker marker) {
         Library library = getLibraryFromMarker(marker);
         if (library != null) {
-            onLibraryClick(false, library.name, "address", library.getId());
+            onLibraryClick(false, library.name, "address", library.getId(), library.getImageUrl());
         }
         return true;
     }
