@@ -70,8 +70,11 @@ public class LibraryInfo extends AppCompatActivity
     private ApiService apiService;
     private GoogleMap mGoogleMap;
     private int libraryId;
-    private String libraryName = "";
+    private String libraryName = null;
     private int zoomMap = 15;
+
+    TextView titleText;
+    ImageView libraryImage;
 
     LatLng libraryLocation;
 
@@ -105,6 +108,10 @@ public class LibraryInfo extends AppCompatActivity
         //Get Library Name
         Intent intent = getIntent();
         libraryId = intent.getIntExtra("libraryId", 1);
+        String name = intent.getStringExtra("name");
+        titleText = (TextView) findViewById(R.id.libraryName);
+        titleText.setText(name);
+        libraryImage = findViewById(R.id.libraryImage);
 
         //Get Favorite Libraries
         SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
@@ -303,7 +310,6 @@ public class LibraryInfo extends AppCompatActivity
 
                             // Set the library name and image
                             libraryName = library.getName();
-                            TextView titleText = findViewById(R.id.libraryName);
                             titleText.setText(libraryName);
 
                             ImageView libraryImage = findViewById(R.id.libraryImage);
