@@ -19,4 +19,11 @@
     <string name="unknown">Libro desconocido</string>
     <string name="available"> está disponible</string>
     <string name="favoritelibrary">Elige en </string>
+    <string name="name">Nombre: </string>
+    <string name="location">Ubicación: </string>
+    <string name="curent">Usar ubicación actual</string>
+    <string name="marker">Usar marcador</string>
+    <string name="librarypicture">Seleccione la imagen de la biblioteca: </string>
+    <string name="newlibrary">Registrar nueva biblioteca</string>
+    <string name="addlibrary">Agregar una biblioteca</string>
 </resources>

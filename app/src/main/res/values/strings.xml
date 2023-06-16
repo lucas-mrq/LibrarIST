@@ -19,4 +19,11 @@
     <string name="unknown">Unknown Book</string>
     <string name="available"> is avalable</string>
     <string name="favoritelibrary">Pick it at </string>
+    <string name="name">Name: </string>
+    <string name="location">Location: </string>
+    <string name="curent">Use current location</string>
+    <string name="marker">Use marker</string>
+    <string name="librarypicture">Please select library picture: </string>
+    <string name="newlibrary">Register new Library</string>
+    <string name="addlibrary">Add a library</string>
 </resources>

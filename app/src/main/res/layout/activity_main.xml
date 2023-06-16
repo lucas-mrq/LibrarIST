@@ -27,6 +27,16 @@
 
         <include layout="@layout/bottom_layout" />
 
+        <Button
+            android:id="@+id/newLibrary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/searchLocation"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/addlibrary" />
+
     </RelativeLayout>
 
 </LinearLayout>

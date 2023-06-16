@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/newBookView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NewLibrary">
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/bottom_layout"
+        tools:layout_editor_absoluteX="-58dp"
+        tools:layout_editor_absoluteY="108dp" />
+
+    <TextView
+        android:id="@+id/libraryLocationText"
+        android:layout_width="0dp"
+        android:layout_height="19dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text=""
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/locationText"
+        app:layout_constraintTop_toTopOf="@+id/locationText" />
+
+    <TextView
+        android:id="@+id/locationLibrary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/libraryName" />
+
+    <TextView
+        android:id="@+id/libraryName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/name"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/libraryNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:ems="10"
+        android:inputType="text"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/libraryName"
+        app:layout_constraintStart_toEndOf="@+id/libraryName"
+        app:layout_constraintTop_toTopOf="@+id/libraryName" />
+
+    <TextView
+        android:id="@+id/photoLibrary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/librarypicture"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map" />
+
+    <TextView
+        android:id="@+id/locationText"
+        android:layout_width="90dp"
+        android:layout_height="20dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text="@string/location"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/locationLibrary"
+        app:layout_constraintTop_toBottomOf="@+id/locationLibrary" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="209dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.217"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxCurrentLocation" />
+
+    <SearchView
+        android:id="@+id/searchLocation"
+        android:layout_width="275dp"
+        android:layout_height="31dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/search_bar"
+        android:queryHint="@string/search"
+        app:layout_constraintStart_toStartOf="@+id/map"
+        app:layout_constraintTop_toTopOf="@+id/map" />
+
+
+    <Button
+        android:id="@+id/cameraPhoto"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="10dp"
+        android:text="@string/fromcamera"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="@+id/photoLibrary"
+        app:layout_constraintStart_toEndOf="@+id/photoLibrary"
+        app:layout_constraintTop_toTopOf="@+id/photoLibrary" />
+
+    <Button
+        android:id="@+id/filePhoto"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/fromfile"
+        android:textSize="8sp"
+        app:layout_constraintStart_toStartOf="@+id/cameraPhoto"
+        app:layout_constraintTop_toBottomOf="@+id/cameraPhoto" />
+
+    <ImageView
+        android:id="@+id/libraryImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/registerButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filePhoto" />
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="45dp"
+        android:text="@string/newlibrary"
+        app:layout_constraintBottom_toBottomOf="@+id/include"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <CheckBox
+        android:id="@+id/checkBoxCurrentLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/curent"
+        app:layout_constraintStart_toStartOf="@+id/locationText"
+        app:layout_constraintTop_toBottomOf="@+id/locationText" />
+
+    <CheckBox
+        android:id="@+id/checkBoxMarker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="@string/marker"
+        app:layout_constraintStart_toEndOf="@+id/checkBoxCurrentLocation"
+        app:layout_constraintTop_toTopOf="@+id/checkBoxCurrentLocation" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

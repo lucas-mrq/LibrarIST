@@ -190,6 +190,14 @@ public class MainActivity extends AppCompatActivity
             intentSearch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intentSearch);
         });
+
+        // Define Add a new library button
+        Button addLibraryButton = (Button) findViewById(R.id.newLibrary);
+        addLibraryButton.setOnClickListener(view -> {
+            Intent intentNewLibrary = new Intent(MainActivity.this, NewLibrary.class);
+            startActivity(intentNewLibrary);
+        });
+
     }
 
     /**
