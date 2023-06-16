@@ -54,4 +54,7 @@ public interface ApiService {
 
     @POST("/api/libraries/{libraryId}/books/{bookId}/checkin")
     Call<Void> checkInBook(@Path("libraryId") int libraryId, @Path("bookId") int bookId);
+
+    @POST("/api/libraries/{libraryId}/book/{bookId}/checkout")
+    Call<Void> checkOutBook(@Path("libraryId") int libraryId, @Path("bookId") int bookId);
 }

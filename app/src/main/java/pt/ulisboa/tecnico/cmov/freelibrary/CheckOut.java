@@ -62,9 +62,10 @@ public class CheckOut extends AppCompatActivity {
 
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setContentView(R.layout.activity_check_in_horizontal);
+            setContentView(R.layout.activity_check_out_horizontal);
         } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            setContentView(R.layout.activity_check_in);
+            setContentView(R.layout.activity_check_out);
+            setContentView(R.layout.activity_check_out);
         }
 
         Locale currentLocale = Locale.getDefault();
@@ -78,7 +79,7 @@ public class CheckOut extends AppCompatActivity {
         libraryText.setText(libraryName);
 
         //Define Map & Search Buttons
-        Button checkOutButton = findViewById(R.id.checkInRegisterButton);
+        Button checkOutButton = findViewById(R.id.checkOutRegisterButton);
         checkOutButton.setOnClickListener(view -> {
             checkOutScanCode(intent);
         });
@@ -176,8 +177,29 @@ public class CheckOut extends AppCompatActivity {
         }
     }
 
-    private void CheckOutBook(int libraryId, int bookId) {
-        //ToDo
+    private void checkOutBook(int libraryId, int bookId) {
+        Call<Void> checkOutCall = apiService.checkOutBook(libraryId, bookId);
+        checkOutCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "Book checked out successfully", Toast.LENGTH_SHORT).show();
+
+                    // Start the LibraryInfo activity
+                    Intent intentLibraryInfo = new Intent(CheckOut.this, LibraryInfo.class);
+                    intentLibraryInfo.putExtra("libraryId", libraryId);
+                    startActivity(intentLibraryInfo);
+                    finish();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Book check out failed with " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Book check out failed", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void setLocale(String language) {
@@ -247,14 +269,15 @@ public class CheckOut extends AppCompatActivity {
                     if (book != null) {
                         int bookId = book.getId();
 
-                        // Call the method to check in the book
-                        // checkOutBook(libraryId, bookId);
+                        // Call the method to check out the book
+                        checkOutBook(libraryId, bookId);
                         Intent intentCheckOut = new Intent(CheckOut.this, MainActivity.class);
                         startActivity(intentCheckOut);
                         finish();
                     }
                 } else {
-                    Toast.makeText(CheckOut.this, "@string/unknown", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Could not find book to check out", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             }
 
